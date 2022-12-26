@@ -1,0 +1,25 @@
+<EmberTable class='fl-1 w-100%' as |t|>
+    <t.head
+        @columns={{this.columns}}
+        @fillMode='last-column'
+        @enableReorder={{false}}
+        @enableResize={{false}}
+    />
+    <t.body
+        @rows={{this.rows}}
+        @onSelect={{queue (fn (mut this.selectedTask)) this.sayHello}}
+        @selection={{this.selectedTask}}
+        @checkboxSelectionMode='none'
+        @rowSelectionMode='single'
+        as |b|
+    >
+        <b.row
+            class='Table-row border-bottom'
+            as |r|
+        >
+            <r.cell class='pv-1' as |cellValue column|>
+                {{if (eq column.valuePath 'dueDate') (display-date cellValue type='short') cellValue}}
+            </r.cell>
+        </b.row>
+    </t.body>
+</EmberTable>

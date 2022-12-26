@@ -1,0 +1,15 @@
+{{page-title 'Schedule'}}
+
+<div class='fb-row w-100% ml-2 mt-2'>
+    <div class='courses-container w-6 h-8 blue-border ba bw-2'>
+        <Compositions::CourseList
+            @scheduleName={{this.scheduleName}}
+            @onScheduleNameChange={{this.onScheduleNameChange}}
+        />
+    </div>
+    <div class='tasks-container h-max-70% w-70% ml-7'>
+        <Compositions::TasksTable/>
+    </div>
+    
+</div>
+

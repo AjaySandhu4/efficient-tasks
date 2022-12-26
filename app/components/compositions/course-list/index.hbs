@@ -1,0 +1,19 @@
+<div class='fb-column ml-2'>
+    {{#if this.courseCreationMode}}
+        <ModalDialog
+            @translucentOverlay={{true}}
+        >
+            Yo
+        </ModalDialog>
+    {{else}}
+        <Blocks::HeaderInput
+            @value={{this.firestore.scheduleName}}
+            @placeholder='Enter schedule name'
+            @onSubmit={{@onScheduleNameChange}}
+        />
+        {{#each this.firestore.courses as |course|}}
+            <button class='w-3 pa-1 mv-2' type='button'>{{course.code}}</button>
+        {{/each}}
+        <button class='w-3 pa-1 mv-2' type='button' {{on 'click' (fn (mut this.courseCreationMode) true)}}>Add Course +</button>
+    {{/if}}
+</div>

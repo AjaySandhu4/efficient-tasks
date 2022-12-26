@@ -1,0 +1,36 @@
+/* == flexbox: fb ==================================================================== */
+/*      display: fb-[column, row]
+/*      align:   fb-align-[start, end, center, baseline, stretch]
+/*      justify: fb-justify-[start, end, center, space-between, space-around]
+/*      wrap:    fb-[wrap, nowrap, wrap-reverse]
+/*      reverse: fb-[column-reverse, row-reverse]
+/* =================================================================================== */
+
+.fb-column        { display: flex;        flex-direction: column; }
+.fb-inline-column { display: inline-flex; flex-direction: column; }
+
+.fb-row        { display: flex;        flex-direction: row; }
+.fb-inline-row { display: inline-flex; flex-direction: row; }
+
+.fb-align-start    { align-items: flex-start; }
+.fb-align-end      { align-items: flex-end; }
+.fb-align-center   { align-items: center; }
+.fb-align-baseline { align-items: baseline; }
+.fb-align-stretch  { align-items: stretch; }
+
+.fb-align-content-start { align-content: flex-start; }
+.fb-align-content-end   { align-content: flex-end; }
+
+.fb-justify-start         { justify-content: flex-start; }
+.fb-justify-end           { justify-content: flex-end; }
+.fb-justify-center        { justify-content: center; }
+.fb-justify-space-around  { justify-content: space-around; }
+.fb-justify-space-between { justify-content: space-between; }
+.fb-justify-space-evenly  { justify-content: space-evenly; }
+
+.fb-wrap         { flex-wrap: wrap; }
+.fb-nowrap       { flex-wrap: nowrap; }
+.fb-wrap-reverse { flex-wrap: wrap-reverse; }
+
+.fb-column-reverse { display: flex; flex-direction: column-reverse; }
+.fb-row-reverse    { display: flex; flex-direction: row-reverse; }

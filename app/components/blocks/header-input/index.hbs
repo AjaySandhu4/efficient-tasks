@@ -1,0 +1,9 @@
+{{!-- template-lint-disable require-input-label --}}
+<Input
+    @type='text'
+    @value={{this.currInput}}
+    placeholder='Enter schedule name'
+    class={{'header-input w-5.5 pa-1 mv-2' ...attributes}}
+    maxlength='30'
+    {{on 'focusout' this.submit}}
+/>
