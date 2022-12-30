@@ -1,0 +1,18 @@
+<ModalDialog
+    @containerClassNames='fb-column h-5 w-6'
+    @translucentOverlay={{true}}
+    @onClose={{@onClose}}
+>
+    <Blocks::HeaderInput
+        @value={{this.courseCode}}
+        @placeholder='Enter course code'
+        @onSubmit={{fn (mut this.courseCode)}}
+    />
+    <Compositions::CourseList::CourseModal::ColorPicker
+        @selectedColor={{this.courseColor}}
+        @onSelectColor={{fn (mut this.courseColor)}}
+    />
+    <div class='fb-row-reverse'>
+        <Blocks::Button class='w-2.5 pa-1' disabled={{this.isDoneButtonDisabled}} {{on 'click' this.submit}}>Done</Blocks::Button>
+    </div>
+</ModalDialog>

@@ -1,0 +1,96 @@
+.ember-modal-dialog {
+  border-radius: var(--radius-4);
+  background-color: white;
+  box-shadow: var(--shadow-dialog);
+  padding: var(--spacing-4);
+}
+
+.ember-modal-overlay.translucent {
+  background-color: rgba(128, 128, 128, .77);
+}
+
+.ember-modal-dialog {
+  z-index: calc(var(--z-5) + 1);
+  position: fixed;
+}
+
+.ember-modal-dialog.emd-in-place {
+  position: static;
+}
+
+.ember-modal-wrapper.emd-static.emd-wrapper-target-attachment-center .ember-modal-dialog {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ember-modal-wrapper.emd-static.emd-wrapper-target-attachment-center.preserved-stacking-context .ember-modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Gridstack doesn't work well when used inside nested stacking context.
+// This ensures that the whole modal remains inside parent's context
+.ember-modal-wrapper.emd-static.emd-wrapper-target-attachment-center.preserved-stacking-context .ember-modal-dialog {
+  transform: unset;
+}
+
+.ember-modal-wrapper.emd-animatable.emd-wrapper-target-attachment-center {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ember-modal-wrapper.emd-animatable.emd-wrapper-target-attachment-center .ember-modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ember-modal-wrapper.emd-animatable .ember-modal-dialog {
+  position: relative;
+}
+
+.ember-modal-overlay {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-5);
+}
+
+.Confirmation-Dialog {
+  width: 480px;
+  min-height: 192px;
+  z-index: 9999;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--background-dropdown);
+  box-shadow: var(--shadow-dialog);
+  padding-top: var(--spacing-4);
+  padding-left: var(--spacing-5);
+  padding-right: var(--spacing-5);
+  padding-bottom: var(--spacing-5);
+}
+
+.close-confirmation-dialog-button {
+  border-radius: var(--radius-3);
+  width: 32px;
+  height: 32px;
+}
+
+.action-confirmation-dialog-button {
+  border-radius: var(--radius-3);
+  margin-left: 4px;
+  margin-right: 4px;
+}

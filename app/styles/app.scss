@@ -2,6 +2,7 @@
 @import 'tachyons/index';
 @import 'dictionary';
 @import 'components';
+@import 'courses';
 
 .ember-application {
     height: 100vh;
@@ -12,4 +13,8 @@
 
 body {
     margin: 0;
+}
+
+.button-clicked {
+    border-style: inset;
 }

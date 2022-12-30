@@ -4,3 +4,13 @@
 
 .tasks-container {
 }
+
+.edit-button {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.edit-button:hover {
+    background-color: var(--border-blue);
+}

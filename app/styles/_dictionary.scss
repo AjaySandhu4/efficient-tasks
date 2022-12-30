@@ -313,6 +313,31 @@
 
   --border-blue: #9DBBD7;
 
+  /*Courses colour palette*/
+  --color-1: #C13939;
+  --color-2: #26bc67;
+  --color-3: #0471b9;
+  --color-4: #B61517;
+  --color-5: #8f7106;
+  --color-6: #0b6017;
+  --color-7: #643c0e;
+  --color-8: #a49d53;
+  --color-9: #794EA4;
+  --color-10: #b66713;
+
+  --bg-color-1: #F2C1C1;
+  --bg-color-2: #afe8c8;
+  --bg-color-3: #a9cfe8;
+  --bg-color-4: #e0b2b3;
+  --bg-color-5: #ddd1a6;
+  --bg-color-6: #b3dab9;
+  --bg-color-7: #e2d0bc;
+  --bg-color-8: #e1ddb3;
+  --bg-color-9: #DED5FF;
+  --bg-color-10: #e0c8b4;
+  
+
+
   /* Values overriden by the theme service, these only exist as fallbacks for the case when the theme service isn't present (e.g. @skylight/anvil) */
   --accedian-primary: #43b6d6;
   --accedian-primary-rgb: 71, 193, 191;

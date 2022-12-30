@@ -2,15 +2,15 @@
 
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 'es2020',
     sourceType: 'module',
     ecmaFeatures: {
       legacyDecorators: true,
     },
   },
-  plugins: ['ember'],
+  plugins: ['ember', '@typescript-eslint'],
   extends: [
     'eslint:recommended',
     'plugin:ember/recommended',
@@ -52,7 +52,10 @@ module.exports = {
     {
       // test files
       files: ['tests/**/*-test.{js,ts}'],
-      extends: ['plugin:qunit/recommended'],
+      extends: [
+        'plugin:qunit/recommended',
+        'plugin:@typescript-eslint/recommended',
+      ],
     },
   ],
 };

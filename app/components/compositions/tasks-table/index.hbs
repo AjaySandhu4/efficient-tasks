@@ -1,4 +1,4 @@
-<EmberTable class='fl-1 w-100%' as |t|>
+<EmberTable class='w-100% h-auto' as |t|>
     <t.head
         @columns={{this.columns}}
         @fillMode='last-column'
@@ -14,7 +14,7 @@
         as |b|
     >
         <b.row
-            class='Table-row border-bottom'
+            class='Table-row border-bottom task-row-color-{{b.rowValue.courseColor}}'
             as |r|
         >
             <r.cell class='pv-1' as |cellValue column|>
@@ -23,3 +23,5 @@
         </b.row>
     </t.body>
 </EmberTable>
+
+<Blocks::Button class='blue-border mt-3'>Add Tasks +</Blocks::Button>

@@ -1,0 +1,10 @@
+{{!
+    interface Args {
+        filename: string
+    }
+}}
+
+<div ...attributes class='relative'>
+  {{svg-jar @filename class='w-100% h-100%'}}
+  {{yield}}
+</div>
