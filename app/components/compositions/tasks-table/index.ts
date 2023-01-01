@@ -3,20 +3,9 @@ import { faker } from '@faker-js/faker';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service'
-import FirestoreService from '../../../services/firestore'
-import Task from '../../../models/task';
+import FirestoreService, { Task } from '../../../services/firestore'
 
 // interface Args {}
-
-// interface Row {
-//   dueDate: string;
-//   courseCode: string;
-//   taskType: string;
-//   taskName: string;
-//   weight: number;
-//   isCompleted: boolean;
-// }
-
 export interface Column {
   cellComponent?: string;
   isResizable?: boolean;
@@ -29,14 +18,14 @@ export interface Column {
 }
 
 export default class CompositionsTasksTableComponent extends Component {
-  testTaskTypes: string[] = [
-    'Assignment',
-    'Exam',
-    'Quiz',
-    'Test',
-    'Presentation',
-    'Reading',
-  ];
+  // testTaskTypes: string[] = [
+  //   'Assignment',
+  //   'Exam',
+  //   'Quiz',
+  //   'Test',
+  //   'Presentation',
+  //   'Reading',
+  // ];
 
   @service firestore!: FirestoreService;
 
@@ -58,13 +47,13 @@ export default class CompositionsTasksTableComponent extends Component {
       },
       {
         name: 'Task Type',
-        valuePath: 'taskType',
+        valuePath: 'type',
         textAlign: 'left',
         width: 150,
       },
       {
         name: 'Task Name',
-        valuePath: 'taskName',
+        valuePath: 'name',
         textAlign: 'left',
         width: 300,
       },
@@ -90,15 +79,15 @@ export default class CompositionsTasksTableComponent extends Component {
     //   rowArray.push({
     //     dueDate: `${dueDate.getMonth() + 1}/${dueDate.getDate()}`,
     //     courseCode: 'COMP3005A',
-    //     taskType:
+    //     type:
     //       this.testTaskTypes[faker.datatype.number({ min: 0, max: 5 })] ?? '',
-    //     taskName: faker.random.words(),
+    //     name: faker.random.words(),
     //     weight: faker.datatype.number(100),
     //     isCompleted: faker.datatype.boolean(),
     //   });
     // }
     // return rowArray;
-    return this.firestore.tasks;
+    return Object.values(this.firestore.tasks).sort((taskA, taskB) => taskA.dueDate.getTime() - taskB.dueDate.getTime());
   }
 
   @action sayHello(): void {

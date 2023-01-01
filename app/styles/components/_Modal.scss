@@ -11,6 +11,7 @@
 
 .ember-modal-dialog {
   z-index: calc(var(--z-5) + 1);
+  // z-index: var(--z-2);
   position: fixed;
 }
 

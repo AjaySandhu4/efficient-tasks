@@ -1,0 +1,59 @@
+<ModalDialog
+    @containerClassNames='fb-column h-4 fb-justify-space-between'
+    @translucentOverlay={{true}}
+    {{!-- @renderInPlace={{true}} --}}
+    @onClose={{@onClose}}
+>
+    <div class='fb-row'>
+        <EmberFlatpickr 
+            placeholder='Due date' 
+            @date={{this.taskModel.dueDate}} 
+            @onChange={{this.updateDueDate}} 
+            @allowInput={{true}}
+            {{!-- @altInput={{true}}
+            @altFormat='d/m/y' --}}
+            @dateFormat='d/m/y h:iK'
+            @enableTime={{true}}
+            @defaultHour={{23}}
+            @defaultMinute={{59}}
+            {{!-- @parseDate={{fn this.parseDate}} --}}
+        />
+        <PowerSelect class='w-4 mh-1' 
+            @placeholder='Course' 
+            @renderInPlace={{true}} 
+            @options={{this.firestore.courses}} 
+            @selected={{if (eq this.taskModel.courseColor 0) undefined (hash code=this.taskModel.courseCode color=this.taskModel.courseColor)}}
+            @onChange={{this.updateCourse}}
+            as |course|
+        >
+            {{!-- <span class='course-color-{{course.color}}'> --}}
+                {{course.code}}
+            {{!-- </span> --}}
+        </PowerSelect>
+        <PowerSelect 
+            class='w-4 mh-1' 
+            @placeholder='Task type' 
+            @renderInPlace={{true}} 
+            @options={{this.taskTypes}} 
+            @onChange={{fn (mut this.taskModel.type)}} 
+            @selected={{this.taskModel.type}}
+            as |type|
+        >
+            {{type}}
+        </PowerSelect>
+        {{!-- template-lint-disable require-input-label --}}
+        <Input class='mh-1' @type='text' placeholder='Task name' @value={{this.taskModel.name}} {{on 'input' this.updateName}}/>
+        <Input 
+            class='mh-1 w-4' 
+            @type='number' 
+            min='0' 
+            max='100'
+            placeholder='Weight (eg. 15)' 
+            @value={{if (eq this.taskModel.weight -1) undefined this.taskModel.weight}}
+            {{on 'input' this.updateWeight}}
+        />
+    </div>
+    <div class='fb-row-reverse'>
+        <Blocks::Button class='w-2.5 pa-1' disabled={{this.isFormDirty}} {{on 'click' this.submit}}>Done</Blocks::Button>
+    </div>
+</ModalDialog>

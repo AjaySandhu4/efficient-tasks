@@ -55,6 +55,7 @@
     "@types/ember-data__store": "^4.0.2",
     "@types/ember-qunit": "^6.1.1",
     "@types/ember-resolver": "^9.0.0",
+    "@types/lodash": "^4.14.191",
     "@types/qunit": "^2.19.3",
     "@types/rsvp": "^4.0.4",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
@@ -77,9 +78,11 @@
     "ember-concurrency-ts": "^0.3.1",
     "ember-data": "~4.7.3",
     "ember-fetch": "^8.1.2",
+    "ember-flatpickr": "^3.2.3",
     "ember-load-initializers": "^2.1.2",
     "ember-modal-dialog": "^4.0.1",
     "ember-page-title": "^7.0.0",
+    "ember-power-select": "^6.0.1",
     "ember-qunit": "^6.0.0",
     "ember-resolver": "^8.0.3",
     "ember-source": "~4.8.0",
@@ -110,6 +113,7 @@
     "edition": "octane"
   },
   "dependencies": {
-    "firebase": "^9.15.0"
+    "firebase": "^9.15.0",
+    "lodash": "^4.17.21"
   }
 }

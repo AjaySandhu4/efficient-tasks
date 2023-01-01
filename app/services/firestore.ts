@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { arrayRemove, arrayUnion, collection, doc, Firestore, getDoc, getDocs, getFirestore, query, QuerySnapshot, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, doc, Firestore, getDoc, getDocs, getFirestore, query, QuerySnapshot, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object'
 
@@ -14,10 +14,21 @@ export type Task = {
   dueDate: Date,
   courseCode: string,
   courseColor: number,
-  taskType: string,
-  taskName: string,
+  type: string,
+  name: string,
   weight: number,
-  isCompleted: boolean
+  isCompleted: boolean,
+  id: string,
+}
+
+export type TaskPreValidation = {
+  dueDate: Date | null,
+  courseCode: string,
+  courseColor: number,
+  type: string,
+  name: string,
+  weight: number,
+  isCompleted: boolean,
 }
 
 export default class FirestoreService extends Service {
@@ -26,7 +37,7 @@ export default class FirestoreService extends Service {
 
     @tracked scheduleName: string = ''
     @tracked courses: Course[] = []
-    @tracked tasks: Task[] = [];
+    @tracked tasks: {[id: string]: Task} = {};
 
 
   @action async setup(): Promise<void> {
@@ -68,7 +79,8 @@ export default class FirestoreService extends Service {
     await getDocs(colRef).then((querySnap: QuerySnapshot) => {
       querySnap.forEach(doc => {
         const data = doc.data();
-        this.tasks.push({...data, dueDate: data['dueDate'].toDate()} as Task);
+        // this.tasks.push({...data, dueDate: data['dueDate'].toDate()} as Task);
+        this.tasks[doc.id] = {...data, dueDate: data['dueDate'].toDate(), id: doc.id} as Task
       });
     });
     console.log(this.tasks);
@@ -84,10 +96,8 @@ export default class FirestoreService extends Service {
     console.log(newCourse);
     const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", "4CLPUSS7RVhssk9doRGu");
     await updateDoc(docRef, {
-      // courses: arrayUnion({code: newCourse.code, color: newCourse.color})
       courses: arrayUnion(newCourse)
     }).catch(e => console.log(e));
-    // this.courses.push({...newCourse});
     this.courses.push(newCourse);
     this.courses = this.courses
     console.log(this.courses);
@@ -97,7 +107,7 @@ export default class FirestoreService extends Service {
     console.log(originalCourse, updatedCourse);
 
     //Remove old course and replace with updated version
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", "4CLPUSS7RVhssk9doRGu");
+    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', '4CLPUSS7RVhssk9doRGu');
     await updateDoc(docRef, {
       courses: arrayRemove(originalCourse)
     }).catch(e => console.log(e));
@@ -105,7 +115,7 @@ export default class FirestoreService extends Service {
       courses: arrayUnion(updatedCourse)
     }).catch(e => console.log(e));
 
-    const tasksRef = collection(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks")
+    const tasksRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks');
     const taskQuery = query(tasksRef, where('courseCode', '==', originalCourse.code));
     const batch = writeBatch(this.db);
     await getDocs(taskQuery).then(querySnapshot => {
@@ -119,7 +129,7 @@ export default class FirestoreService extends Service {
     batch.commit();
 
     //Update tasks locally
-    this.tasks.forEach(t => {
+    Object.values(this.tasks).forEach(t => {
       if(t.courseCode === originalCourse.code){
         set(t, 'courseCode', updatedCourse.code);
         set(t, 'courseColor', updatedCourse.color);
@@ -132,5 +142,16 @@ export default class FirestoreService extends Service {
     if(courseToUpdateIndex != -1) this.courses[courseToUpdateIndex] = updatedCourse;
     else console.log('Something went wrong updating the course!');
     this.courses = this.courses;
+  }
+
+  @action async addTask(newTask: TaskPreValidation): Promise<void> {
+    if(!(newTask.courseCode && newTask.courseColor && newTask.dueDate && newTask.name)){
+      console.log('Failed to add task');
+      return;
+    }
+    const colRef = collection(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu", "tasks");
+    const docRef = await addDoc(colRef, newTask);
+    this.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
+    this.tasks = this.tasks;
   }
 }

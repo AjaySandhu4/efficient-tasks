@@ -1,0 +1,10 @@
+/* == z-index: z-[0..3 | default] ==================================================== */
+
+.z-default { z-index: var(--z-default); }
+.z-0       { z-index: var(--z-0); }
+.z-1       { z-index: var(--z-1); }
+.z-2       { z-index: var(--z-2); }
+.z-3       { z-index: var(--z-3); }
+.z-4       { z-index: var(--z-4); }
+.z-5       { z-index: var(--z-5); }
+.z-6       { z-index: var(--z-6); }

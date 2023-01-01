@@ -24,4 +24,10 @@
     </t.body>
 </EmberTable>
 
-<Blocks::Button class='blue-border mt-3'>Add Tasks +</Blocks::Button>
+<Blocks::Button class='blue-border mt-3' {{on 'click' (fn (mut this.creationMode) true)}}>Add Tasks +</Blocks::Button>
+
+{{#if this.creationMode}}
+    <Compositions::TasksTable::TaskCreationModal
+        @onClose={{fn (mut this.creationMode) false}}
+    />
+{{/if}}
