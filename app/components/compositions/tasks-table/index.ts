@@ -93,4 +93,9 @@ export default class CompositionsTasksTableComponent extends Component {
   @action sayHello(): void {
     console.log('Hello!');
   }
+
+  @action completeTask(isCurrentlyCompleted: boolean, id: string){
+    console.log(!isCurrentlyCompleted, id);
+    this.firestore.completeTask(!isCurrentlyCompleted, id);
+  }
 }

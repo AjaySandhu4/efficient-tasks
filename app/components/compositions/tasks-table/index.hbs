@@ -17,8 +17,22 @@
             class='Table-row border-bottom task-row-color-{{b.rowValue.courseColor}}'
             as |r|
         >
-            <r.cell class='pv-1' as |cellValue column|>
-                {{if (eq column.valuePath 'dueDate') (display-date cellValue type='short') cellValue}}
+            <r.cell {{!--class='pv-1'--}} as |cellValue column|>
+                {{#if (eq column.valuePath 'dueDate')}}
+                    {{display-date cellValue type='short'}}
+                {{else if (eq column.valuePath 'isCompleted')}}
+                    {{!-- <Blocks::Button class='h-1 w-1 pa-0 ma-0'>
+                        <Blocks::Icon class='ma-0 pa-0' @filename='check'/>
+                    </Blocks::Button> --}}
+                    {{!-- template-lint-disable require-input-label --}}
+                    <div class='fb-row fb-justify-center fb-align-center'>
+                        {{!-- <Input class='task-completion-checkbox' @type='checkbox' @checked={{cellValue}} {{on 'input' (fn this.firestore.updateTask b.rowValue)}}/> --}}
+                        <Input class='task-completion-checkbox' @type='checkbox' @checked={{cellValue}} {{on 'input' (fn this.completeTask cellValue b.rowValue.id)}}/>
+                    </div>
+                    
+                {{else}}
+                    {{cellValue}}
+                {{/if}}
             </r.cell>
         </b.row>
     </t.body>

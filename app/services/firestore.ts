@@ -154,4 +154,28 @@ export default class FirestoreService extends Service {
     this.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
     this.tasks = this.tasks;
   }
+
+  // @action async updateTask(updatedTask: Task): Promise<void> {
+  //   console.log(updatedTask);
+  //   const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", updatedTask.id);
+  //   // console.log(docRef.exists());
+  //   // console.log(docRef);
+  //   await getDoc(docRef).then(docSnap => {
+  //     console.log(docSnap.exists());
+  //   });
+
+  //   // await setDoc(docRef, updatedTask).catch(e => console.log(e));
+  //   this.tasks[updatedTask.id] = updatedTask;
+    
+  // }
+
+  @action async completeTask(isCompleted: boolean, id: string){
+    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", id);
+    await updateDoc(docRef, {isCompleted: isCompleted});
+
+    const indexedTask: Task | undefined = this.tasks[id];
+    if(indexedTask === undefined) return;
+    set(indexedTask, 'isCompleted', isCompleted);  
+    console.log(this.tasks[id])
+  }
 }
