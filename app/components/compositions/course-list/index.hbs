@@ -1,4 +1,4 @@
-<div class='fb-column ml-2'>
+<div class='fb-column ml-2 pl-2'>
     <Blocks::HeaderInput
         @value={{this.firestore.scheduleName}}
         @placeholder='Enter schedule name'
@@ -6,8 +6,13 @@
     />
     {{#each this.firestore.courses as |course|}}
         <div class='fb-row mv-2'>
-            <Blocks::Button class='w-3 pa-1 course-color-{{course.color}}' {{on 'click' (fn this.onSelectCourse course)}}>{{course.code}}</Blocks::Button>
-            <Blocks::Button class='edit-button h-1 w-1 pa-0 ml-1' {{on 'click' (fn (mut this.courseToEdit) course)}}>
+            <Blocks::Button 
+                class='w-3 pa-1 course-color-{{course.color}} {{if (eq @selectedCourse.code course.code) (concat 'course-color-' course.color '-selected')}}' 
+                {{on 'click' (fn this.onSelectCourse course)}}
+            >
+                {{course.code}}
+            </Blocks::Button>
+            <Blocks::Button class='edit-button h-1 w-1 pa-0 ml-3' {{on 'click' (fn (mut this.courseToEdit) course)}}>
                 <Blocks::Icon class='mr-0 pa-0 w-80%' @filename='edit'/>
             </Blocks::Button>
         </div>

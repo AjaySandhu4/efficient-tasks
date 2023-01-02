@@ -10,12 +10,9 @@
         @onSubmit={{fn (mut this.courseCode)}}
         />
         {{#if @course}}
-            {{!-- <Blocks::Button class='delete-button' {{on 'click' this.deleteCourse}}>
-                <Blocks::Icon class='delete-icon' @filename='trash'/>
-            </Blocks::Button> --}}
             <Blocks::DeleteButton 
                 @onClick={{this.deleteCourse}}
-                @warningMsg='Are you sure you want to delete this course? All of its associated tasks will be deleted as well.'
+                @warningMsg='Are you sure you want to delete this course and all of its associated tasks?'
             />
         {{/if}}
     </div>
