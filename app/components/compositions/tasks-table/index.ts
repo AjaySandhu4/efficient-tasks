@@ -4,8 +4,11 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service'
 import FirestoreService, { Task } from '../../../services/firestore'
+import { Course } from '../../../services/firestore'
 
-// interface Args {}
+interface Args {
+  selectedCourse: Course
+}
 export interface Column {
   cellComponent?: string;
   isResizable?: boolean;
@@ -17,7 +20,7 @@ export interface Column {
   width?: number;
 }
 
-export default class CompositionsTasksTableComponent extends Component {
+export default class CompositionsTasksTableComponent extends Component<Args> {
   // testTaskTypes: string[] = [
   //   'Assignment',
   //   'Exam',
@@ -87,11 +90,27 @@ export default class CompositionsTasksTableComponent extends Component {
     //   });
     // }
     // return rowArray;
-    return Object.values(this.firestore.tasks).sort((taskA, taskB) => taskA.dueDate.getTime() - taskB.dueDate.getTime());
+    let rows: Task[] = Object.values(this.firestore.tasks);
+    if(this.args.selectedCourse){
+      rows = rows.filter(t => t.courseCode === this.args.selectedCourse.code)
+    }
+    rows.sort((taskA, taskB) => taskA.dueDate.getTime() - taskB.dueDate.getTime());
+
+    return rows;
   }
 
   @action sayHello(): void {
-    console.log('Hello!');
+    console.log(this.selectedTask);
+  }
+
+  @action onSelectTask(task: Task): void {
+    if(task.id === this.selectedTask?.id){
+      this.selectedTask = undefined;
+    }
+    else{
+      this.selectedTask = task;
+    }
+    console.log(this.selectedTask);
   }
 
   @action completeTask(isCurrentlyCompleted: boolean, id: string){

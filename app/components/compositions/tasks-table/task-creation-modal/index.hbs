@@ -1,7 +1,7 @@
 <ModalDialog
     @containerClassNames='fb-column h-4 fb-justify-space-between'
     @translucentOverlay={{true}}
-    {{!-- @renderInPlace={{true}} --}}
+    {{!-- @renderInPlace={{@task}} --}}
     @onClose={{@onClose}}
 >
     <div class='fb-row'>
@@ -53,7 +53,16 @@
             {{on 'input' this.updateWeight}}
         />
     </div>
-    <div class='fb-row-reverse'>
-        <Blocks::Button class='w-2.5 pa-1' disabled={{this.isFormDirty}} {{on 'click' this.submit}}>Done</Blocks::Button>
+    <div class='fb-row fb-justify-space-between'>
+        {{#if @task}}
+            <Blocks::DeleteButton
+                @onClick={{this.deleteTask}}
+                @warningMsg='Are you sure you would like to delete this task?'
+            />
+        {{/if}}
+        <div class='fb-row'>
+            <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' @onClose}}>Close</Blocks::Button>
+            <Blocks::Button class='w-2.5 pa-1' disabled={{this.isFormDirty}} {{on 'click' this.submit}}>Done</Blocks::Button>
+        </div>
     </div>
 </ModalDialog>

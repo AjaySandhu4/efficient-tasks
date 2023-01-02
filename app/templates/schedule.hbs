@@ -5,10 +5,14 @@
         <Compositions::CourseList
             @scheduleName={{this.scheduleName}}
             @onScheduleNameChange={{this.onScheduleNameChange}}
+            @selectedCourse={{this.selectedCourse}}
+            @onSelectCourse={{fn (mut this.selectedCourse)}}
         />
     </div>
     <div class='tasks-container h-max-8 w-70% ml-7'>
-        <Compositions::TasksTable/>
+        <Compositions::TasksTable
+            @selectedCourse={{this.selectedCourse}}
+        />
     </div>
 </div>
 

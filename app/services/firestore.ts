@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { addDoc, arrayRemove, arrayUnion, collection, doc, Firestore, getDoc, getDocs, getFirestore, query, QuerySnapshot, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, Firestore, getDoc, getDocs, getFirestore, query, QuerySnapshot, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object'
 
@@ -29,6 +29,7 @@ export type TaskPreValidation = {
   name: string,
   weight: number,
   isCompleted: boolean,
+  id: string
 }
 
 export default class FirestoreService extends Service {
@@ -115,6 +116,7 @@ export default class FirestoreService extends Service {
       courses: arrayUnion(updatedCourse)
     }).catch(e => console.log(e));
 
+    //Update each task
     const tasksRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks');
     const taskQuery = query(tasksRef, where('courseCode', '==', originalCourse.code));
     const batch = writeBatch(this.db);
@@ -155,19 +157,15 @@ export default class FirestoreService extends Service {
     this.tasks = this.tasks;
   }
 
-  // @action async updateTask(updatedTask: Task): Promise<void> {
-  //   console.log(updatedTask);
-  //   const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", updatedTask.id);
-  //   // console.log(docRef.exists());
-  //   // console.log(docRef);
-  //   await getDoc(docRef).then(docSnap => {
-  //     console.log(docSnap.exists());
-  //   });
+  @action async updateTask(updatedTask: Task): Promise<void> {
+    console.log(updatedTask);
+    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", updatedTask.id);
+    await updateDoc(docRef, updatedTask);
 
-  //   // await setDoc(docRef, updatedTask).catch(e => console.log(e));
-  //   this.tasks[updatedTask.id] = updatedTask;
+    this.tasks[updatedTask.id] = updatedTask;
+    this.tasks = this.tasks;
     
-  // }
+  }
 
   @action async completeTask(isCompleted: boolean, id: string){
     const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", id);
@@ -176,6 +174,33 @@ export default class FirestoreService extends Service {
     const indexedTask: Task | undefined = this.tasks[id];
     if(indexedTask === undefined) return;
     set(indexedTask, 'isCompleted', isCompleted);  
-    console.log(this.tasks[id])
+    // console.log(this.tasks[id])
+  }
+
+  @action async deleteCourse(course: Course): Promise<void> {
+    //Deleting course on firestore
+    const scheduleDocRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/', '4CLPUSS7RVhssk9doRGu');
+    await updateDoc(scheduleDocRef, {courses: arrayRemove(course)});
+    const taskColRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks');
+    await getDocs(taskColRef).then(querySnap => {
+      querySnap.forEach(doc => {
+        const docsCourseCode: string = doc.data()['courseCode'];
+        if (docsCourseCode === course.code) deleteDoc(doc.ref);
+      })
+    })
+
+    //Deleting course locally
+    this.courses = this.courses.filter(c => c.code !== course.code);
+    Object.values(this.tasks).forEach(t => {
+      if (t.courseCode === course.code) delete this.tasks[t.id];
+    });
+    this.tasks = this.tasks;
+  }
+
+  @action async deleteTask(taskId: string): Promise<void> {
+    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks', taskId);
+    await deleteDoc(docRef);
+    delete this.tasks[taskId];
+    this.tasks = this.tasks;
   }
 }

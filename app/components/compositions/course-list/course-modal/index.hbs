@@ -3,16 +3,29 @@
     @translucentOverlay={{true}}
     @onClose={{@onClose}}
 >
-    <Blocks::HeaderInput
+    <div class='fb-row fb-justify-space-between fb-align-center'>
+        <Blocks::HeaderInput
         @value={{this.courseCode}}
         @placeholder='Enter course code'
         @onSubmit={{fn (mut this.courseCode)}}
-    />
+        />
+        {{#if @course}}
+            {{!-- <Blocks::Button class='delete-button' {{on 'click' this.deleteCourse}}>
+                <Blocks::Icon class='delete-icon' @filename='trash'/>
+            </Blocks::Button> --}}
+            <Blocks::DeleteButton 
+                @onClick={{this.deleteCourse}}
+                @warningMsg='Are you sure you want to delete this course? All of its associated tasks will be deleted as well.'
+            />
+        {{/if}}
+    </div>
+    
     <Compositions::CourseList::CourseModal::ColorPicker
         @selectedColor={{this.courseColor}}
         @onSelectColor={{fn (mut this.courseColor)}}
     />
     <div class='fb-row-reverse'>
         <Blocks::Button class='w-2.5 pa-1' disabled={{this.isDoneButtonDisabled}} {{on 'click' this.submit}}>Done</Blocks::Button>
+        <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' @onClose}}>Close</Blocks::Button>
     </div>
 </ModalDialog>

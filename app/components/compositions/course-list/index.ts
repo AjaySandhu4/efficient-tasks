@@ -5,7 +5,9 @@ import { service } from '@ember/service';
 import { action } from '@ember/object';
 
 interface Args {
-  onScheduleNameChange: (name: string) => void;
+  selectedCourse: Course,
+  onScheduleNameChange: (name: string) => void,
+  onSelectCourse: (course?: Course) => void,
 }
 
 export default class CompositionsCourseListComponent extends Component<Args> {
@@ -13,4 +15,13 @@ export default class CompositionsCourseListComponent extends Component<Args> {
 
   @tracked creationMode: boolean = false;
   @tracked courseToEdit?: Course;
+
+  @action onSelectCourse(course: Course): void {
+    if(course.code === this.args.selectedCourse?.code){
+      this.args.onSelectCourse(undefined);
+      return;
+    } 
+    this.args.onSelectCourse(course);
+    console.log('?');
+  }
 }

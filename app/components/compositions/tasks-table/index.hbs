@@ -7,7 +7,8 @@
     />
     <t.body
         @rows={{this.rows}}
-        @onSelect={{queue (fn (mut this.selectedTask)) this.sayHello}}
+        {{!-- @onSelect={{queue (fn (mut this.selectedTask)) this.sayHello}} --}}
+        @onSelect={{this.onSelectTask}}
         @selection={{this.selectedTask}}
         @checkboxSelectionMode='none'
         @rowSelectionMode='single'
@@ -21,15 +22,11 @@
                 {{#if (eq column.valuePath 'dueDate')}}
                     {{display-date cellValue type='short'}}
                 {{else if (eq column.valuePath 'isCompleted')}}
-                    {{!-- <Blocks::Button class='h-1 w-1 pa-0 ma-0'>
-                        <Blocks::Icon class='ma-0 pa-0' @filename='check'/>
-                    </Blocks::Button> --}}
                     {{!-- template-lint-disable require-input-label --}}
                     <div class='fb-row fb-justify-center fb-align-center'>
                         {{!-- <Input class='task-completion-checkbox' @type='checkbox' @checked={{cellValue}} {{on 'input' (fn this.firestore.updateTask b.rowValue)}}/> --}}
                         <Input class='task-completion-checkbox' @type='checkbox' @checked={{cellValue}} {{on 'input' (fn this.completeTask cellValue b.rowValue.id)}}/>
                     </div>
-                    
                 {{else}}
                     {{cellValue}}
                 {{/if}}
@@ -43,5 +40,11 @@
 {{#if this.creationMode}}
     <Compositions::TasksTable::TaskCreationModal
         @onClose={{fn (mut this.creationMode) false}}
+    />
+{{/if}}
+{{#if this.selectedTask}}
+    <Compositions::TasksTable::TaskCreationModal
+        @onClose={{fn (mut this.selectedTask) undefined}}
+        @task={{this.selectedTask}}
     />
 {{/if}}

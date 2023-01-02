@@ -32,6 +32,12 @@ export default class CompositionsCourseListCourseModalComponent extends Componen
     this.args.onClose();
   }
 
+  @action async deleteCourse(): Promise<void> {
+    if(!this.args.course) return;
+    await this.firestore.deleteCourse(this.args.course);
+    this.args.onClose();
+  }
+
   validateCode(code: string): boolean {
     const isCodeUnique: boolean = this.firestore.courses.map(course => course.code).indexOf(code) === -1;
     console.log(!isEmpty(code) && isCodeUnique);

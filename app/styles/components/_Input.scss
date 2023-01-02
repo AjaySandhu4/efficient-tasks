@@ -4,3 +4,19 @@
     border-bottom: 2px solid;
     font-size: 24px
 }
+
+.delete-button {
+    background-color: transparent;
+    height: 2.25rem;
+    width: 2.25rem;
+    padding: 0 0 0 0;
+    border: none;
+}
+
+.delete-button:hover {
+    background-color: var(--border-blue);
+}
+
+.delete-icon {
+    filter: invert(11%) sepia(100%) saturate(7063%) hue-rotate(29deg) brightness(100%) contrast(95%);
+}
