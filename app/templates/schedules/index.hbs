@@ -1,0 +1,18 @@
+{{page-title "Schedules"}}
+<div class='w-100% fb-row'>
+    {{#each-in this.firestore.schedules as |id schedule|}}
+        <Blocks::Button class='schedule-card' {{on 'click' (fn this.transitionToSchedule id)}}>
+            <div class='fb-column h-100% ma-2'>
+                <div class='schedule-card-title fb-row fb-justify-center f-5 mv-4'>
+                    {{schedule.name}}
+                </div>
+                {{#each schedule.courses as |course|}}
+                <div class='schedule-card-course-{{course.color}} f-3'>
+                    {{course.code}}
+                </div>
+                    
+                {{/each}}
+            </div>
+        </Blocks::Button> 
+    {{/each-in}}
+</div>

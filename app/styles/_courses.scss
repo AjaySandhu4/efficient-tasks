@@ -19,3 +19,9 @@
     background-color: var(--bg-color-#{$i});
   }
 }
+
+@for $i from 1 through 10 {
+  .schedule-card-course-#{$i} {
+    color: var(--color-#{$i});
+  }
+}

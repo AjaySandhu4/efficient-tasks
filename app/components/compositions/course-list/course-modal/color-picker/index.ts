@@ -16,7 +16,7 @@ export default class CompositionsCourseListCourseModalColorPickerComponent exten
     get availableColors(): {[index: number]: boolean} {
         const availability: {[index: number]: boolean} = {};
         for(let i: number = 1; i<=10; ++i) availability[i] = true;
-        this.firestore.courses.forEach(c =>  availability[c.color] = false);
+        this.firestore.currSchedule?.courses.forEach(c =>  availability[c.color] = false);
         return availability;
     }
 
@@ -25,4 +25,10 @@ export default class CompositionsCourseListCourseModalColorPickerComponent exten
         this.selectedColor = parsedColorNum;
         this.args.onSelectColor(parsedColorNum);
     }
+
+    // @action isSelectedColor(color: any): boolean {
+    //     console.log('?')
+    //     console.log(typeof color);
+    //     return this.selectedColor == color;
+    // }
 }

@@ -21,7 +21,7 @@
         <PowerSelect class='w-4 mh-1' 
             @placeholder='Course' 
             @renderInPlace={{true}} 
-            @options={{this.firestore.courses}} 
+            @options={{this.firestore.currSchedule.courses}} 
             @selected={{if (eq this.taskModel.courseColor 0) undefined (hash code=this.taskModel.courseCode color=this.taskModel.courseColor)}}
             @onChange={{this.updateCourse}}
             as |course|
@@ -53,16 +53,16 @@
             {{on 'input' this.updateWeight}}
         />
     </div>
-    <div class='fb-row fb-justify-space-between'>
+    <div class='fb-row-reverse fb-justify-space-between'>
+        <div class='fb-row'>
+            <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' @onClose}}>Close</Blocks::Button>
+            <Blocks::Button class='w-2.5 pa-1' disabled={{this.isFormDirty}} {{on 'click' this.submit}}>Done</Blocks::Button>
+        </div>
         {{#if @task}}
             <Blocks::DeleteButton
                 @onClick={{this.deleteTask}}
                 @warningMsg='Are you sure you would like to delete this task?'
             />
         {{/if}}
-        <div class='fb-row'>
-            <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' @onClose}}>Close</Blocks::Button>
-            <Blocks::Button class='w-2.5 pa-1' disabled={{this.isFormDirty}} {{on 'click' this.submit}}>Done</Blocks::Button>
-        </div>
     </div>
 </ModalDialog>

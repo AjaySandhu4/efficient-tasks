@@ -90,7 +90,7 @@ export default class CompositionsTasksTableComponent extends Component<Args> {
     //   });
     // }
     // return rowArray;
-    let rows: Task[] = Object.values(this.firestore.tasks);
+    let rows: Task[] = this.firestore.currSchedule ? Object.values(this.firestore.currSchedule?.tasks) : [];
     if(this.args.selectedCourse){
       rows = rows.filter(t => t.courseCode === this.args.selectedCourse.code)
     }

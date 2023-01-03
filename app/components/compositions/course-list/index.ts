@@ -22,6 +22,5 @@ export default class CompositionsCourseListComponent extends Component<Args> {
       return;
     } 
     this.args.onSelectCourse(course);
-    console.log('?');
   }
 }

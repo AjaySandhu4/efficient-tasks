@@ -1,10 +1,10 @@
 <div class='fb-column ml-2 pl-2'>
     <Blocks::HeaderInput
-        @value={{this.firestore.scheduleName}}
+        @value={{this.firestore.currSchedule.name}}
         @placeholder='Enter schedule name'
         @onSubmit={{@onScheduleNameChange}}
     />
-    {{#each this.firestore.courses as |course|}}
+    {{#each this.firestore.currSchedule.courses as |course|}}
         <div class='fb-row mv-2'>
             <Blocks::Button 
                 class='w-3 pa-1 course-color-{{course.color}} {{if (eq @selectedCourse.code course.code) (concat 'course-color-' course.color '-selected')}}' 

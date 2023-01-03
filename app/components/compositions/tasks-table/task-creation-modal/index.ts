@@ -30,7 +30,7 @@ export default class CompositionsTasksTableTaskCreationModalComponent extends Co
     get isFormDirty(): boolean {
         // console.log(this.taskModel);
         if(isEqual(this.taskModel, this.args.task)) return true; //Check if task is unchanged
-        const associatedCourse: Course | undefined = this.firestore.courses.find(c => c.code === this.taskModel.courseCode);
+        const associatedCourse: Course | undefined = this.firestore.currSchedule?.courses.find(c => c.code === this.taskModel.courseCode);
         if(!associatedCourse || associatedCourse.color != this.taskModel.courseColor) return true;
         if(isEmpty(this.taskModel.name) || isEmpty(this.taskModel.type) || this.taskModel.weight === -1) return true;
         return false;

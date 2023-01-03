@@ -32,17 +32,25 @@ export type TaskPreValidation = {
   id: string
 }
 
+export type Schedule = {
+  name: string,
+  courses: Course[],
+  tasks: {[id: string]: Task},
+  id: string
+}
+
 export default class FirestoreService extends Service {
     db!: Firestore
     app!: FirebaseApp
 
-    @tracked scheduleName: string = ''
-    @tracked courses: Course[] = []
-    @tracked tasks: {[id: string]: Task} = {};
+    // @tracked scheduleName: string = ''
+    @tracked schedules: {[id: string]: Schedule} = {};
+    @tracked currSchedule?: Schedule;
+    // @tracked courses: Course[] = [];
+    // @tracked tasks: {[id: string]: Task} = {};
 
 
   @action async setup(): Promise<void> {
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
       apiKey: 'AIzaSyAPnRFwuaE09yt95MTR7shtQDlcxiTrr1E',
       authDomain: 'efficient-tasks.firebaseapp.com',
@@ -57,58 +65,75 @@ export default class FirestoreService extends Service {
     this.app = initializeApp(firebaseConfig);
     this.db = getFirestore(this.app);
 
-    await this.fetchSchedule();
-    await this.fetchTasks();
+    await this.fetchSchedules();
+    // await this.fetchSchedule();
+    // await this.fetchTasks();
   }
 
-  @action async fetchSchedule(): Promise<void> {
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", "4CLPUSS7RVhssk9doRGu");
+  @action async setupSchedule(id: string): Promise<void> {
+    await this.fetchSchedule(id);
+    await this.fetchTasks(id);
+  }
+
+  @action async fetchSchedules(): Promise<void> {
+    const colRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules');
+    await getDocs(colRef).then((querySnap: QuerySnapshot) => {
+      querySnap.forEach(doc => {
+        const data = doc.data();
+        this.schedules[doc.id] = {...data, id: doc.id} as Schedule
+      });
+    });
+  }
+
+  @action async fetchSchedule(id: string): Promise<void> {
+    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", id);
     const docSnap = await getDoc(docRef);
     console.log(docSnap);
     if (docSnap.exists()) {
       const data = docSnap.data();
-      this.scheduleName = data['name'];
-      this.courses = data['courses'];
-      console.log(this.scheduleName, this.courses);
+      this.currSchedule = {...data, id: id} as Schedule;
+      console.log(this.currSchedule);
     } else {
       console.log("Failed to retrieve the schedule!");
     }
   }
 
-  @action async fetchTasks(): Promise<void> {
-    const colRef = collection(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu", "tasks");
+  @action async fetchTasks(scheduleId: string): Promise<void> {
+    if(!this.currSchedule) return;
+    const tasks: {[id: string]: Task} = {}
+    const colRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${scheduleId}`, 'tasks');
     await getDocs(colRef).then((querySnap: QuerySnapshot) => {
       querySnap.forEach(doc => {
         const data = doc.data();
-        // this.tasks.push({...data, dueDate: data['dueDate'].toDate()} as Task);
-        this.tasks[doc.id] = {...data, dueDate: data['dueDate'].toDate(), id: doc.id} as Task
+        tasks[doc.id] = {...data, dueDate: data['dueDate'].toDate(), id: doc.id} as Task
       });
     });
-    console.log(this.tasks);
+    this.currSchedule.tasks = tasks;
+    console.log(this.currSchedule.tasks);
   }
 
   @action async updateScheduleName(newName: string): Promise<void> {
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", "4CLPUSS7RVhssk9doRGu");
+    if(!this.currSchedule) return;
+    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', this.currSchedule.id);
     await setDoc(docRef, {name: newName}, { merge: true}).catch(e => console.log(e));
-    this.scheduleName = newName;
+    this.currSchedule.name = newName;
   }
 
   @action async addCourse(newCourse: Course): Promise<void> {
-    console.log(newCourse);
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", "4CLPUSS7RVhssk9doRGu");
+    if (!this.currSchedule) return;
+    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', this.currSchedule.id);
     await updateDoc(docRef, {
       courses: arrayUnion(newCourse)
     }).catch(e => console.log(e));
-    this.courses.push(newCourse);
-    this.courses = this.courses
-    console.log(this.courses);
+    this.currSchedule.courses.push(newCourse);
+    this.currSchedule = this.currSchedule
   }
 
   @action async updateCourse(originalCourse: Course, updatedCourse: Course): Promise<void> {
-    console.log(originalCourse, updatedCourse);
+    if (!this.currSchedule) return;
 
     //Remove old course and replace with updated version
-    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', '4CLPUSS7RVhssk9doRGu');
+    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', this.currSchedule.id);
     await updateDoc(docRef, {
       courses: arrayRemove(originalCourse)
     }).catch(e => console.log(e));
@@ -117,7 +142,7 @@ export default class FirestoreService extends Service {
     }).catch(e => console.log(e));
 
     //Update each task
-    const tasksRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks');
+    const tasksRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`);
     const taskQuery = query(tasksRef, where('courseCode', '==', originalCourse.code));
     const batch = writeBatch(this.db);
     await getDocs(taskQuery).then(querySnapshot => {
@@ -131,57 +156,62 @@ export default class FirestoreService extends Service {
     batch.commit();
 
     //Update tasks locally
-    Object.values(this.tasks).forEach(t => {
+    Object.values(this.currSchedule.tasks).forEach(t => {
       if(t.courseCode === originalCourse.code){
         set(t, 'courseCode', updatedCourse.code);
         set(t, 'courseColor', updatedCourse.color);
       }
     })
-    this.tasks = this.tasks;
 
     //Update course locally
-    let courseToUpdateIndex: number = this.courses.findIndex(c => c.code === originalCourse.code);
-    if(courseToUpdateIndex != -1) this.courses[courseToUpdateIndex] = updatedCourse;
+    let courseToUpdateIndex: number = this.currSchedule.courses.findIndex(c => c.code === originalCourse.code);
+    // if(courseToUpdateIndex != -1) this.currSchedule.courses[courseToUpdateIndex] = updatedCourse;
+    if(courseToUpdateIndex != -1) set(this.currSchedule.courses, courseToUpdateIndex, updatedCourse);
     else console.log('Something went wrong updating the course!');
-    this.courses = this.courses;
+
+    this.currSchedule = this.currSchedule;
   }
 
   @action async addTask(newTask: TaskPreValidation): Promise<void> {
+    if (!this.currSchedule) return;
     if(!(newTask.courseCode && newTask.courseColor && newTask.dueDate && newTask.name)){
       console.log('Failed to add task');
       return;
     }
-    const colRef = collection(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu", "tasks");
+    const colRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}`, "tasks");
     const docRef = await addDoc(colRef, newTask);
-    this.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
-    this.tasks = this.tasks;
+    this.currSchedule.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
+    this.currSchedule = this.currSchedule;
   }
 
   @action async updateTask(updatedTask: Task): Promise<void> {
     console.log(updatedTask);
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", updatedTask.id);
+    if (!this.currSchedule) return;
+    const docRef = doc(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`, updatedTask.id);
     await updateDoc(docRef, updatedTask);
 
-    this.tasks[updatedTask.id] = updatedTask;
-    this.tasks = this.tasks;
+    this.currSchedule.tasks[updatedTask.id] = updatedTask;
+    this.currSchedule = this.currSchedule;
     
   }
 
   @action async completeTask(isCompleted: boolean, id: string){
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks", id);
+    if (!this.currSchedule) return;
+    const docRef = doc(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`, id);
     await updateDoc(docRef, {isCompleted: isCompleted});
 
-    const indexedTask: Task | undefined = this.tasks[id];
+    const indexedTask: Task | undefined = this.currSchedule.tasks[id];
     if(indexedTask === undefined) return;
     set(indexedTask, 'isCompleted', isCompleted);  
     // console.log(this.tasks[id])
   }
 
   @action async deleteCourse(course: Course): Promise<void> {
+    if (!this.currSchedule) return;
     //Deleting course on firestore
-    const scheduleDocRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/', '4CLPUSS7RVhssk9doRGu');
+    const scheduleDocRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/', this.currSchedule.id);
     await updateDoc(scheduleDocRef, {courses: arrayRemove(course)});
-    const taskColRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks');
+    const taskColRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`);
     await getDocs(taskColRef).then(querySnap => {
       querySnap.forEach(doc => {
         const docsCourseCode: string = doc.data()['courseCode'];
@@ -190,17 +220,18 @@ export default class FirestoreService extends Service {
     })
 
     //Deleting course locally
-    this.courses = this.courses.filter(c => c.code !== course.code);
-    Object.values(this.tasks).forEach(t => {
-      if (t.courseCode === course.code) delete this.tasks[t.id];
+    this.currSchedule.courses = this.currSchedule.courses.filter(c => c.code !== course.code);
+    Object.values(this.currSchedule.tasks).forEach(t => {
+      if (t.courseCode === course.code && this.currSchedule) delete this.currSchedule.tasks[t.id];
     });
-    this.tasks = this.tasks;
+    this.currSchedule = this.currSchedule;
   }
 
   @action async deleteTask(taskId: string): Promise<void> {
-    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/4CLPUSS7RVhssk9doRGu/tasks', taskId);
+    if (!this.currSchedule) return;
+    const docRef = doc(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`, taskId);
     await deleteDoc(docRef);
-    delete this.tasks[taskId];
-    this.tasks = this.tasks;
+    delete this.currSchedule.tasks[taskId];
+    this.currSchedule = this.currSchedule;
   }
 }
