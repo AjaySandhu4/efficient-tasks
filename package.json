@@ -114,6 +114,7 @@
   },
   "dependencies": {
     "firebase": "^9.15.0",
+    "firebaseui": "^6.0.2",
     "lodash": "^4.17.21"
   }
 }

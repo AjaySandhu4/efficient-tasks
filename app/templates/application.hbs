@@ -1,4 +1,7 @@
 {{page-title "EfficientTasks"}}
-<div class='w-100% h-100% fl-1 relative fb-column'>
+<div 
+    class='w-100% h-100% fl-1 relative fb-column'
+    {{did-insert this.firestore.setupUser}}
+>
     {{outlet}}
 </div>

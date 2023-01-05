@@ -9,6 +9,7 @@ export default class SchedulesController extends Controller {
     @service router!: RouterService
 
     @action transitionToSchedule(id: string): void {
-        this.router.transitionTo(`/schedules/${id}`);
+        console.log('making transistion from here')
+        this.router.transitionTo(`schedules/${id}`);
     }
 }

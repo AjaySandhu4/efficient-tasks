@@ -3,6 +3,9 @@ import { FirebaseApp, initializeApp } from 'firebase/app';
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, Firestore, getDoc, getDocs, getFirestore, query, QuerySnapshot, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object'
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { isEmpty } from '@ember/utils';
+import RouterService from '@ember/routing/router-service'
 
 export type Course = {
   code: string,
@@ -39,18 +42,22 @@ export type Schedule = {
   id: string
 }
 
+export type User = {
+  email: string,
+  displayName: string,
+  id: string,
+}
+
 export default class FirestoreService extends Service {
     db!: Firestore
     app!: FirebaseApp
 
-    // @tracked scheduleName: string = ''
+    @tracked user?: User
     @tracked schedules: {[id: string]: Schedule} = {};
     @tracked currSchedule?: Schedule;
-    // @tracked courses: Course[] = [];
-    // @tracked tasks: {[id: string]: Task} = {};
+    @tracked router!: RouterService;
 
-
-  @action async setup(): Promise<void> {
+  @action setupApp(): void {
     const firebaseConfig = {
       apiKey: 'AIzaSyAPnRFwuaE09yt95MTR7shtQDlcxiTrr1E',
       authDomain: 'efficient-tasks.firebaseapp.com',
@@ -64,19 +71,40 @@ export default class FirestoreService extends Service {
     // Initialize Firebase
     this.app = initializeApp(firebaseConfig);
     this.db = getFirestore(this.app);
+  }
 
-    await this.fetchSchedules();
-    // await this.fetchSchedule();
-    // await this.fetchTasks();
+  @action async setupUser(): Promise<void> {
+    onAuthStateChanged(getAuth(), user => {
+      if (user) {
+          console.log('From onAuthStateChanged', user);
+          const docRef = doc(this.db, `users/${user.uid}`);
+          getDoc(docRef).then(docSnap => {
+            if(docSnap.exists()){
+              this.user = { email: user.email ?? '', displayName: user.displayName ?? '', id: user.uid };
+            }
+            else {
+              setDoc(docRef, {name: user.displayName, email: user.email})
+                .then(() => this.user = { email: user.email ?? '', displayName: user.displayName ?? '', id: user.uid })
+                .catch(e => console.log(e));
+            }
+          });
+      } else {
+          this.router.transitionTo('login');
+      }
+    })
   }
 
   @action async setupSchedule(id: string): Promise<void> {
     await this.fetchSchedule(id);
     await this.fetchTasks(id);
+    console.log(this.currSchedule)
   }
 
   @action async fetchSchedules(): Promise<void> {
-    const colRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules');
+    // const colRef = collection(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules');
+    if(!this.user) return;
+    console.log(`users/${this.user.id}/schedules`);
+    const colRef = collection(this.db, `users/${this.user.id}/schedules`);
     await getDocs(colRef).then((querySnap: QuerySnapshot) => {
       querySnap.forEach(doc => {
         const data = doc.data();
@@ -86,7 +114,8 @@ export default class FirestoreService extends Service {
   }
 
   @action async fetchSchedule(id: string): Promise<void> {
-    const docRef = doc(this.db, "users/c8i2ObhQPz9mAxfWN7Sa/schedules", id);
+    if(!this.user) return;
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, id);
     const docSnap = await getDoc(docRef);
     console.log(docSnap);
     if (docSnap.exists()) {
@@ -94,14 +123,14 @@ export default class FirestoreService extends Service {
       this.currSchedule = {...data, id: id} as Schedule;
       console.log(this.currSchedule);
     } else {
-      console.log("Failed to retrieve the schedule!");
+      console.log('Failed to retrieve the schedule!');
     }
   }
 
   @action async fetchTasks(scheduleId: string): Promise<void> {
-    if(!this.currSchedule) return;
+    if(!this.user || !this.currSchedule) return;
     const tasks: {[id: string]: Task} = {}
-    const colRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${scheduleId}`, 'tasks');
+    const colRef = collection(this.db, `users/${this.user.id}/schedules/${scheduleId}`, 'tasks');
     await getDocs(colRef).then((querySnap: QuerySnapshot) => {
       querySnap.forEach(doc => {
         const data = doc.data();
@@ -113,15 +142,15 @@ export default class FirestoreService extends Service {
   }
 
   @action async updateScheduleName(newName: string): Promise<void> {
-    if(!this.currSchedule) return;
-    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', this.currSchedule.id);
-    await setDoc(docRef, {name: newName}, { merge: true}).catch(e => console.log(e));
+    if(!this.user || !this.currSchedule) return;
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
+    await updateDoc(docRef, {name: newName}).catch(e => console.log(e));
     this.currSchedule.name = newName;
   }
 
   @action async addCourse(newCourse: Course): Promise<void> {
-    if (!this.currSchedule) return;
-    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', this.currSchedule.id);
+    if (!this.user || !this.currSchedule) return;
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
     await updateDoc(docRef, {
       courses: arrayUnion(newCourse)
     }).catch(e => console.log(e));
@@ -130,10 +159,10 @@ export default class FirestoreService extends Service {
   }
 
   @action async updateCourse(originalCourse: Course, updatedCourse: Course): Promise<void> {
-    if (!this.currSchedule) return;
+    if (!this.user || !this.currSchedule) return;
 
     //Remove old course and replace with updated version
-    const docRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules', this.currSchedule.id);
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
     await updateDoc(docRef, {
       courses: arrayRemove(originalCourse)
     }).catch(e => console.log(e));
@@ -142,7 +171,7 @@ export default class FirestoreService extends Service {
     }).catch(e => console.log(e));
 
     //Update each task
-    const tasksRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`);
+    const tasksRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`);
     const taskQuery = query(tasksRef, where('courseCode', '==', originalCourse.code));
     const batch = writeBatch(this.db);
     await getDocs(taskQuery).then(querySnapshot => {
@@ -173,12 +202,12 @@ export default class FirestoreService extends Service {
   }
 
   @action async addTask(newTask: TaskPreValidation): Promise<void> {
-    if (!this.currSchedule) return;
+    if (!this.user || !this.currSchedule) return;
     if(!(newTask.courseCode && newTask.courseColor && newTask.dueDate && newTask.name)){
       console.log('Failed to add task');
       return;
     }
-    const colRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}`, "tasks");
+    const colRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}`, 'tasks');
     const docRef = await addDoc(colRef, newTask);
     this.currSchedule.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
     this.currSchedule = this.currSchedule;
@@ -186,8 +215,8 @@ export default class FirestoreService extends Service {
 
   @action async updateTask(updatedTask: Task): Promise<void> {
     console.log(updatedTask);
-    if (!this.currSchedule) return;
-    const docRef = doc(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`, updatedTask.id);
+    if (!this.user || !this.currSchedule) return;
+    const docRef = doc(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`, updatedTask.id);
     await updateDoc(docRef, updatedTask);
 
     this.currSchedule.tasks[updatedTask.id] = updatedTask;
@@ -196,8 +225,8 @@ export default class FirestoreService extends Service {
   }
 
   @action async completeTask(isCompleted: boolean, id: string){
-    if (!this.currSchedule) return;
-    const docRef = doc(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`, id);
+    if (!this.user || !this.currSchedule) return;
+    const docRef = doc(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`, id);
     await updateDoc(docRef, {isCompleted: isCompleted});
 
     const indexedTask: Task | undefined = this.currSchedule.tasks[id];
@@ -207,11 +236,11 @@ export default class FirestoreService extends Service {
   }
 
   @action async deleteCourse(course: Course): Promise<void> {
-    if (!this.currSchedule) return;
+    if (!this.user || !this.currSchedule) return;
     //Deleting course on firestore
-    const scheduleDocRef = doc(this.db, 'users/c8i2ObhQPz9mAxfWN7Sa/schedules/', this.currSchedule.id);
+    const scheduleDocRef = doc(this.db, `users/${this.user.id}/schedules/`, this.currSchedule.id);
     await updateDoc(scheduleDocRef, {courses: arrayRemove(course)});
-    const taskColRef = collection(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`);
+    const taskColRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`);
     await getDocs(taskColRef).then(querySnap => {
       querySnap.forEach(doc => {
         const docsCourseCode: string = doc.data()['courseCode'];
@@ -228,8 +257,8 @@ export default class FirestoreService extends Service {
   }
 
   @action async deleteTask(taskId: string): Promise<void> {
-    if (!this.currSchedule) return;
-    const docRef = doc(this.db, `users/c8i2ObhQPz9mAxfWN7Sa/schedules/${this.currSchedule.id}/tasks`, taskId);
+    if (!this.user || !this.currSchedule) return;
+    const docRef = doc(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`, taskId);
     await deleteDoc(docRef);
     delete this.currSchedule.tasks[taskId];
     this.currSchedule = this.currSchedule;
