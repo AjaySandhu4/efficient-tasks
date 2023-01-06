@@ -12,11 +12,12 @@ interface Args {
 export default class CompositionsCourseListCourseModalColorPickerComponent extends Component<Args> {
     @service firestore!: FirestoreService;
     @tracked selectedColor?: number = this.args.selectedColor;
+    originalColor?: number = this.args.selectedColor;
 
     get availableColors(): {[index: number]: boolean} {
         const availability: {[index: number]: boolean} = {};
         for(let i: number = 1; i<=10; ++i) availability[i] = true;
-        this.firestore.currSchedule?.courses.forEach(c =>  availability[c.color] = false);
+        this.firestore.currSchedule?.courses.forEach(c => {if (c.color !== this.originalColor) availability[c.color] = false});
         return availability;
     }
 
@@ -26,9 +27,8 @@ export default class CompositionsCourseListCourseModalColorPickerComponent exten
         this.args.onSelectColor(parsedColorNum);
     }
 
-    // @action isSelectedColor(color: any): boolean {
-    //     console.log('?')
-    //     console.log(typeof color);
-    //     return this.selectedColor == color;
-    // }
+    @action isSelectedColor(color: any): boolean {
+        const parsedColorNum = parseInt(color);
+        return this.selectedColor === parsedColorNum;
+    }
 }

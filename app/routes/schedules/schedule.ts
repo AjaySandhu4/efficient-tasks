@@ -4,7 +4,7 @@ import FirestoreService from '../../services/firestore'
 
 export default class SchedulesScheduleRoute extends Route {
   @service firestore!: FirestoreService
-  model(params: {id: string}) {
-    return this.firestore.setupSchedule(params.id);
+  async model(params: {id: string}): Promise<void> {
+    return await this.firestore.setupSchedule(params.id);
   }
 }

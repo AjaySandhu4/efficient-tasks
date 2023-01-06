@@ -8,8 +8,8 @@ export default class SchedulesController extends Controller {
     @service firestore!: FirestoreService
     @service router!: RouterService
 
-    @action transitionToSchedule(id: string): void {
-        console.log('making transistion from here')
-        this.router.transitionTo(`schedules/${id}`);
-    }
+    // @action transitionToSchedule(id: string): void {
+    //     console.log('making transistion from here')
+    //     this.router.transitionTo('schedule', {id: id});
+    // }
 }

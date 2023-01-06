@@ -11,8 +11,7 @@ export default class ApplicationRoute extends Route {
     async beforeModel(): Promise<void> {
         if (isEmpty(this.firestore.user)) {
             this.firestore.setupApp();
-            console.log(getAuth().currentUser);
-            this.router.transitionTo('login')
+            // this.router.transitionTo('login');
         }
     }
 }

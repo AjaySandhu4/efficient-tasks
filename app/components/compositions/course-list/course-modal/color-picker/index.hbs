@@ -1,9 +1,15 @@
 <div class='fb-row w-5 fb-wrap'>
     {{#each-in this.availableColors as |colorIndex isAvailable|}}
-        <Blocks::Button 
-            class='pa-1 ma-1 w-1 h-1 course-color-{{colorIndex}}' 
+        <Blocks::Button
+            class='
+                ma-2 w-1 h-1 
+                color-option-{{colorIndex}} 
+                {{if (compute this.isSelectedColor colorIndex) (concat 'color-option-' colorIndex '-selected')}}
+                {{unless isAvailable (concat 'color-option-' colorIndex '-disabled')}}
+                ' 
             disabled={{not isAvailable}} 
             {{on 'click' (fn this.onSelect colorIndex)}}
+            {{did-insert (fn this.isSelectedColor colorIndex)}}
         />
     {{/each-in}}
 </div>

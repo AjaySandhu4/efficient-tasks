@@ -32,7 +32,7 @@ export type TaskPreValidation = {
   name: string,
   weight: number,
   isCompleted: boolean,
-  id: string
+  id?: string
 }
 
 export type Schedule = {
@@ -89,7 +89,8 @@ export default class FirestoreService extends Service {
             }
           });
       } else {
-          this.router.transitionTo('login');
+        console.log('Going to login');
+        this.router.transitionTo('login');
       }
     })
   }
@@ -97,7 +98,7 @@ export default class FirestoreService extends Service {
   @action async setupSchedule(id: string): Promise<void> {
     await this.fetchSchedule(id);
     await this.fetchTasks(id);
-    console.log(this.currSchedule)
+    console.log('From setupSchedule: ', this.currSchedule)
   }
 
   @action async fetchSchedules(): Promise<void> {
@@ -121,7 +122,7 @@ export default class FirestoreService extends Service {
     if (docSnap.exists()) {
       const data = docSnap.data();
       this.currSchedule = {...data, id: id} as Schedule;
-      console.log(this.currSchedule);
+      console.log('From fetch schedule', this.currSchedule);
     } else {
       console.log('Failed to retrieve the schedule!');
     }
@@ -138,7 +139,7 @@ export default class FirestoreService extends Service {
       });
     });
     this.currSchedule.tasks = tasks;
-    console.log(this.currSchedule.tasks);
+    console.log('From fetchTasks: ', this.currSchedule.tasks);
   }
 
   @action async updateScheduleName(newName: string): Promise<void> {
@@ -208,6 +209,7 @@ export default class FirestoreService extends Service {
       return;
     }
     const colRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}`, 'tasks');
+    delete newTask.id;
     const docRef = await addDoc(colRef, newTask);
     this.currSchedule.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
     this.currSchedule = this.currSchedule;

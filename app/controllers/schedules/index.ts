@@ -10,6 +10,6 @@ export default class SchedulesIndexController extends Controller {
 
     @action transitionToSchedule(id: string): void {
         console.log('making transition from index')
-        this.router.transitionTo(`schedules/${id}`);
+        this.router.transitionTo('schedules.schedule', id);
     }
 }

@@ -17,12 +17,15 @@
         {{/if}}
     </div>
     
-    <Compositions::CourseList::CourseModal::ColorPicker
-        @selectedColor={{this.courseColor}}
-        @onSelectColor={{fn (mut this.courseColor)}}
-    />
-    <div class='fb-row-reverse'>
-        <Blocks::Button class='w-2.5 pa-1' disabled={{this.isDoneButtonDisabled}} {{on 'click' this.submit}}>Done</Blocks::Button>
-        <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' @onClose}}>Close</Blocks::Button>
+    <div class='fb-row fb-justify-space-between fb-align-end'>
+        <Compositions::CourseList::CourseModal::ColorPicker
+            @selectedColor={{this.courseColor}}
+            @onSelectColor={{fn (mut this.courseColor)}}
+        />
+        <div class='fb-row-reverse h-1'>
+            <Blocks::Button class='w-2.5 pa-1' disabled={{this.isDoneButtonDisabled}} {{on 'click' this.submit}}>Done</Blocks::Button>
+            <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' @onClose}}>Close</Blocks::Button>
+        </div>
     </div>
+    
 </ModalDialog>

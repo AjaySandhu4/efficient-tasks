@@ -39,6 +39,7 @@ export default class CompositionsCourseListCourseModalComponent extends Componen
   }
 
   validateCode(code: string): boolean {
+    console.log(this.firestore.currSchedule)
     const isCodeUnique: boolean = this.firestore.currSchedule?.courses.map(course => course.code).indexOf(code) === -1;
     console.log(!isEmpty(code) && isCodeUnique);
     return !isEmpty(code) && isCodeUnique;
