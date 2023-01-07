@@ -22,7 +22,6 @@ export default class LoginController extends Controller {
       ],
       callbacks: {
         signInSuccessWithAuthResult: () => {
-          this.router.transitionTo('schedules')
           return false
         },
         signInFailure: () => {
@@ -34,7 +33,6 @@ export default class LoginController extends Controller {
     if (!this.firebaseAuthUI) {
       const firebaseAuth = getAuth(this.firestore.app)
       const ui = new firebaseui.auth.AuthUI(firebaseAuth)
-
       this.firebaseAuthUI = ui
       ui.start('#firebaseui-auth-container', uiConfig)
     } else {

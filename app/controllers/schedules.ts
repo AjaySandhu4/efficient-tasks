@@ -1,15 +1,3 @@
 import Controller from '@ember/controller';
-import { action } from '@ember/object';
-import RouterService from '@ember/routing/router-service';
-import { service } from '@ember/service';
-import FirestoreService from '../services/firestore';
 
-export default class SchedulesController extends Controller {
-    @service firestore!: FirestoreService
-    @service router!: RouterService
-
-    // @action transitionToSchedule(id: string): void {
-    //     console.log('making transistion from here')
-    //     this.router.transitionTo('schedule', {id: id});
-    // }
-}
+export default class SchedulesController extends Controller {}

@@ -3,5 +3,12 @@
     class='w-100% h-100% fl-1 relative fb-column'
     {{did-insert this.firestore.setupUser}}
 >
-    {{outlet}}
+    {{#if (and this.firestore.isAuthSettled (not this.firestore.isLoggedIn)) }}
+        {{outlet}}
+    {{else if (and this.firestore.isAuthSettled this.firestore.isLoggedIn)}}
+        {{outlet}}
+        <LinkTo @route='schedules'>
+            Schedules
+        </LinkTo>
+    {{/if}}
 </div>

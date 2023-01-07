@@ -12,6 +12,5 @@ export default class SchedulesScheduleController extends Controller {
 
   @action async onScheduleNameChange(newName: string) : Promise<void> {
     await this.firestore.updateScheduleName(newName);
-    console.log('The name has been updated to', this.firestore.currSchedule?.name);
   }
 }
