@@ -5,7 +5,7 @@ import { service } from '@ember/service';
 import { action } from '@ember/object';
 
 interface Args {
-  selectedCourse: Course,
+  selectedCourse?: Course,
   onScheduleNameChange: (name: string) => void,
   onSelectCourse: (course?: Course) => void,
 }
@@ -22,5 +22,12 @@ export default class CompositionsCourseListComponent extends Component<Args> {
       return;
     } 
     this.args.onSelectCourse(course);
+  }
+
+  @action async deleteCourse(): Promise<void> {
+    if(!this.courseToEdit) return;
+    await this.firestore.deleteCourse(this.courseToEdit);
+    if(this.courseToEdit.code === this.args.selectedCourse?.code) this.args.onSelectCourse(undefined)
+    this.courseToEdit = undefined;
   }
 }

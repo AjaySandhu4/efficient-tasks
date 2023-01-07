@@ -7,6 +7,7 @@ import FirestoreService, { Course } from '../../../../services/firestore';
 
 interface Args {
   onClose: () => void;
+  onDelete?: () => Promise<void>
   course?: Course;
 }
 
@@ -29,12 +30,6 @@ export default class CompositionsCourseListCourseModalComponent extends Componen
     else if(this.args.course && this.courseColor && this.courseCode){ //Editing an existing course
         await this.firestore.updateCourse(this.args.course, {code: this.courseCode, color: this.courseColor});
     }
-    this.args.onClose();
-  }
-
-  @action async deleteCourse(): Promise<void> {
-    if(!this.args.course) return;
-    await this.firestore.deleteCourse(this.args.course);
     this.args.onClose();
   }
 

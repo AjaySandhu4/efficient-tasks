@@ -21,11 +21,16 @@ export default class SchedulesIndexController extends Controller {
         this.router.transitionTo('schedules.schedule', id)
     }
 
-    @action async addSchedule(): Promise<void>{
+    @action async addSchedule(): Promise<void> {
         if(this.newScheduleName){
             await this.firestore.addSchedule(this.newScheduleName)
         }
         this.creationMode = false
         this.newScheduleName = ''
+    }
+
+    @action async deleteSchedule(id: string): Promise<void> {
+        console.log('Deleting schedule...')
+        await this.firestore.deleteSchedule(id)
     }
 }

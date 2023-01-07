@@ -259,7 +259,7 @@ export default class FirestoreService extends Service {
   @action async deleteTask(taskId: string): Promise<void> {
     if (!this.user || !this.currSchedule) return;
     const docRef = doc(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`, taskId);
-    await deleteDoc(docRef);
+    await deleteDoc(docRef).catch(() => console.log('Failed to delete task'));
     delete this.currSchedule.tasks[taskId];
     this.currSchedule = this.currSchedule;
   }
@@ -272,6 +272,13 @@ export default class FirestoreService extends Service {
       this.schedules[docRef.id] = {...newSchedule, id: docRef.id, tasks: {}}
       this.schedules = this.schedules
     }).catch(()=> console.log('Failed to add new schedule'))
+  }
 
+  @action async deleteSchedule(id: string): Promise<void> {
+    if(!this.user) return
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, id)
+    await deleteDoc(docRef).catch(() => console.log('Failed to delete schedule'));
+    delete this.schedules[id]
+    this.schedules = this.schedules
   }
 }

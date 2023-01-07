@@ -11,7 +11,7 @@
         />
         {{#if @course}}
             <Blocks::DeleteButton 
-                @onClick={{this.deleteCourse}}
+                @onClick={{@onDelete}}
                 @warningMsg='Are you sure you want to delete this course and all of its associated tasks?'
             />
         {{/if}}

@@ -27,5 +27,6 @@
     <Compositions::CourseList::CourseModal
         @onClose={{fn (mut this.courseToEdit) undefined}}
         @course={{this.courseToEdit}}
+        @onDelete={{this.deleteCourse}}
     />
 {{/if}}
