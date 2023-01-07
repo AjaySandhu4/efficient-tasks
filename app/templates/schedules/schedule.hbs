@@ -1,7 +1,7 @@
 {{page-title 'Schedule'}}
 
 <div class='fb-row w-100% ml-2 mt-2'>
-    <div class='courses-container w-6 h-8 blue-border ba bw-2'>
+    <div class='courses-container w-6 h-min-6 h-max-80vh blue-border ba bw-2'>
         <Compositions::CourseList
             @scheduleName={{this.scheduleName}}
             @onScheduleNameChange={{this.onScheduleNameChange}}
@@ -9,7 +9,7 @@
             @onSelectCourse={{fn (mut this.selectedCourse)}}
         />
     </div>
-    <div class='tasks-container h-max-8 w-70% ml-7'>
+    <div class='tasks-container ml-7 h-max-80vh'>
         <Compositions::TasksTable
             @selectedCourse={{this.selectedCourse}}
         />

@@ -263,4 +263,15 @@ export default class FirestoreService extends Service {
     delete this.currSchedule.tasks[taskId];
     this.currSchedule = this.currSchedule;
   }
+
+  @action async addSchedule(newScheduleName: string): Promise<void> {
+    if(!this.user) return
+    const newSchedule = {name: newScheduleName, courses: []}
+    const colRef = collection(this.db, `users/${this.user.id}/schedules`)
+    await addDoc(colRef, newSchedule).then(docRef => {
+      this.schedules[docRef.id] = {...newSchedule, id: docRef.id, tasks: {}}
+      this.schedules = this.schedules
+    }).catch(()=> console.log('Failed to add new schedule'))
+
+  }
 }

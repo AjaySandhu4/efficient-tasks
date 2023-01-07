@@ -1,5 +1,5 @@
 {{page-title "Schedules"}}
-<div class='w-100% fb-row'>
+<div class='w-100% fb-row fb-wrap overflow-y-scroll'>
     {{#each-in this.firestore.schedules as |id schedule|}}
         <Blocks::Button class='schedule-card' {{on 'click' (fn this.transitionToSchedule id)}}>
             <div class='fb-column h-100% ma-2'>
@@ -13,6 +13,32 @@
                     
                 {{/each}}
             </div>
-        </Blocks::Button> 
+        </Blocks::Button>
     {{/each-in}}
+    <Blocks::Button class='schedule-card fb-column fb-align-center fb-justify-center' {{on 'click' (fn (mut this.creationMode) true)}}>
+        <div class='schedule-card-title fb-row f-6 text-align-center mb-4'>
+            Add New
+        </div>
+        <div class='schedule-card-title fb-row f-6 text-align-center'>
+            Schedule
+        </div>
+    </Blocks::Button>
 </div>
+{{#if this.creationMode}}
+    <ModalDialog
+        @containerClassNames='fb-column fb-justify-space-between h-3 w-6'
+        @translucentOverlay={{true}}
+        @onClickOverlay={{fn (mut this.creationMode) true}}
+        @onClose={{fn (mut this.creationMode) false}}
+    >
+        <Blocks::HeaderInput
+            @value={{this.newScheduleName}}
+            @placeholder='Enter schedule name'
+            @onSubmit={{fn (mut this.newScheduleName)}}
+        />
+        <div class='fb-row-reverse h-1'>
+            <Blocks::Button class='w-2.5 pa-1' disabled={{not this.isNewScheduleValid}} {{on 'click' this.addSchedule}}>Done</Blocks::Button>
+            <Blocks::Button class='w-2.5 pa-1 mr-2' {{on 'click' (fn (mut this.creationMode) false)}}>Close</Blocks::Button>
+        </div>
+    </ModalDialog>
+{{/if}}

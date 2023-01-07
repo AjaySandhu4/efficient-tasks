@@ -6,9 +6,22 @@
     {{#if (and this.firestore.isAuthSettled (not this.firestore.isLoggedIn)) }}
         {{outlet}}
     {{else if (and this.firestore.isAuthSettled this.firestore.isLoggedIn)}}
+        <div class='navbar-container fb-row bb w-100% fb-justify-space-between'>
+            <div class='fb-row'>
+                <LinkTo class='navbar-link br' @route='application'>
+                    Kami
+                </LinkTo>
+                 <LinkTo class='navbar-link br' @route='application'>
+                    Home
+                </LinkTo>
+                <LinkTo class='navbar-link br' @route='schedules'>
+                    My Schedules
+                </LinkTo>
+            </div>
+            <LinkTo class='navbar-link bl' @route='application' {{on 'click' this.handleSignOut}}>
+                Log Out
+            </LinkTo>
+        </div>
         {{outlet}}
-        <LinkTo @route='schedules'>
-            Schedules
-        </LinkTo>
     {{/if}}
 </div>

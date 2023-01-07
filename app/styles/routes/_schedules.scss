@@ -26,9 +26,14 @@
     border-color: var(--border-blue);
     box-shadow: 10px 10px 10px 18px var(--border-blue);
     background-color: white;
-    margin: var(--spacing-6)
+    margin: var(--spacing-6);
+    overflow: hidden;
 }
 
 .schedule-card-title {
     color: var(--schedule-font);
+}
+
+.tasks-table-header {
+    background-color: white;
 }
