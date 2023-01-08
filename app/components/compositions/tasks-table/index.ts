@@ -20,9 +20,18 @@ export interface Column {
 }
 
 export default class CompositionsTasksTableComponent extends Component<Args> {
+  dateFilterOptions = ['All', 'Upcoming', 'Past', 'TBD'];
+  completionFilterOptions = ['All', 'Incomplete', 'Complete'];
+
   @service firestore!: FirestoreService;
 
   @tracked selectedTask?: Task;
+  @tracked dateFilter?: string;
+  @tracked completionFilter?: string;
+
+  // @tracked rows: Task[] = Object.values(
+  //   this.firestore.currSchedule?.tasks ?? {}
+  // );
 
   get columns(): Column[] {
     return [
@@ -65,13 +74,39 @@ export default class CompositionsTasksTableComponent extends Component<Args> {
     ];
   }
 
-  get rows(): Task[] {
+  get filteredRows(): Task[] {
     let rows: Task[] = this.firestore.currSchedule
       ? Object.values(this.firestore.currSchedule?.tasks)
       : [];
+
     if (this.args.selectedCourse) {
       rows = rows.filter((t) => t.courseCode === this.args.selectedCourse.code);
     }
+
+    if (this.dateFilter === this.dateFilterOptions[1]) {
+      //Upcoming tasks
+      console.log('Should be filtering by this');
+      rows = rows.filter(
+        (t) => !t.dueDate || Date.now() - t.dueDate.getTime() <= 0
+      );
+    } else if (this.dateFilter === this.dateFilterOptions[2]) {
+      //Past tasks
+      rows = rows.filter(
+        (t) => t.dueDate && Date.now() - t.dueDate.getTime() > 0
+      );
+    } else if (this.dateFilter === this.dateFilterOptions[3]) {
+      //TBD tasks
+      rows = rows.filter((t) => !t.dueDate);
+    }
+
+    if (this.completionFilter === this.completionFilterOptions[1]) {
+      //Incomplete tasks
+      rows = rows.filter((t) => !t.isCompleted);
+    } else if (this.completionFilter === this.completionFilterOptions[2]) {
+      //Complete tasks
+      rows = rows.filter((t) => t.isCompleted);
+    }
+
     rows.sort((taskA, taskB) => {
       if (taskA.dueDate && taskB.dueDate)
         return taskA.dueDate.getTime() - taskB.dueDate.getTime();

@@ -99,7 +99,10 @@ export default class FirestoreService extends Service {
           };
           this.isLoggedIn = true;
           this.isAuthSettled = true;
-          this.router.transitionTo('schedules'); //TODO: Let user redirect to the url they originally wanted to go to
+          this.router.transitionTo(
+            localStorage.getItem('redirect-url') ?? 'schedules'
+          );
+          localStorage.removeItem('redirect-url');
         });
       } else {
         this.isLoggedIn = false;

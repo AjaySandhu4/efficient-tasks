@@ -1,3 +1,29 @@
+<div class='fb-row fb-align-center mb-1'>
+    <span class='f-4'>
+        Task filters: 
+    </span>
+    <PowerSelect
+        class='w-4 mh-2'
+        @placeholder='Date filter'
+        @selected={{this.dateFilter}}
+        @options={{this.dateFilterOptions}}
+        @onChange={{fn (mut this.dateFilter)}}
+        as |option|
+    >
+        {{option}}
+    </PowerSelect>
+    <PowerSelect
+        class='w-4'
+        @placeholder='Completion filter'
+        @selected={{this.completionFilter}}
+        @options={{this.completionFilterOptions}}
+        @onChange={{fn (mut this.completionFilter)}}
+        as |option|
+    >
+        {{option}}
+    </PowerSelect>
+</div>
+
 <EmberTable as |t|>
     <t.head
         @columns={{this.columns}}
@@ -13,7 +39,7 @@
         </h.row>
     </t.head>
     <t.body
-        @rows={{this.rows}}
+        @rows={{this.filteredRows}}
         @onSelect={{this.onSelectTask}}
         @selection={{this.selectedTask}}
         @checkboxSelectionMode='none'
