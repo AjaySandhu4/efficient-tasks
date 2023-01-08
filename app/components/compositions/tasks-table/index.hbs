@@ -4,7 +4,6 @@
         @fillMode='last-column'
         @enableReorder={{false}}
         @enableResize={{false}}
-        {{!-- @scrollIndicators='vertical' --}}
         as |h|
     >
         <h.row as |r|>
@@ -15,7 +14,6 @@
     </t.head>
     <t.body
         @rows={{this.rows}}
-        {{!-- @onSelect={{queue (fn (mut this.selectedTask)) this.sayHello}} --}}
         @onSelect={{this.onSelectTask}}
         @selection={{this.selectedTask}}
         @checkboxSelectionMode='none'
@@ -26,13 +24,12 @@
             class='Table-row border-bottom task-row-color-{{b.rowValue.courseColor}}'
             as |r|
         >
-            <r.cell {{!--class='pv-1'--}} as |cellValue column|>
+            <r.cell as |cellValue column|>
                 {{#if (eq column.valuePath 'dueDate')}}
                     {{display-date cellValue type='short'}}
                 {{else if (eq column.valuePath 'isCompleted')}}
                     {{!-- template-lint-disable require-input-label --}}
                     <div class='fb-row fb-justify-center fb-align-center'>
-                        {{!-- <Input class='task-completion-checkbox' @type='checkbox' @checked={{cellValue}} {{on 'input' (fn this.firestore.updateTask b.rowValue)}}/> --}}
                         <Input class='task-completion-checkbox' @type='checkbox' @checked={{cellValue}} {{on 'input' (fn this.completeTask cellValue b.rowValue.id)}}/>
                     </div>
                 {{else}}

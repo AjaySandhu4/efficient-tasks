@@ -94,13 +94,14 @@ export default class CompositionsTasksTableComponent extends Component<Args> {
     if(this.args.selectedCourse){
       rows = rows.filter(t => t.courseCode === this.args.selectedCourse.code)
     }
-    rows.sort((taskA, taskB) => taskA.dueDate.getTime() - taskB.dueDate.getTime());
+    rows.sort((taskA, taskB) => {
+      if(taskA.dueDate && taskB.dueDate) return taskA.dueDate.getTime() - taskB.dueDate.getTime()
+      else if(!(taskA.dueDate || taskB.dueDate)) return 0
+      else if(!taskA.dueDate) return 1
+      else return -1
+    })
 
     return rows;
-  }
-
-  @action sayHello(): void {
-    console.log(this.selectedTask);
   }
 
   @action onSelectTask(task: Task): void {
@@ -110,11 +111,9 @@ export default class CompositionsTasksTableComponent extends Component<Args> {
     else{
       this.selectedTask = task;
     }
-    console.log(this.selectedTask);
   }
 
   @action completeTask(isCurrentlyCompleted: boolean, id: string){
-    console.log(!isCurrentlyCompleted, id);
     this.firestore.completeTask(!isCurrentlyCompleted, id);
   }
 }

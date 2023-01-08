@@ -13,17 +13,6 @@ export type Course = {
 }
 
 export type Task = {
-  dueDate: Date,
-  courseCode: string,
-  courseColor: number,
-  type: string,
-  name: string,
-  weight: number,
-  isCompleted: boolean,
-  id: string,
-}
-
-export type TaskPreValidation = {
   dueDate: Date | null,
   courseCode: string,
   courseColor: number,
@@ -31,7 +20,7 @@ export type TaskPreValidation = {
   name: string,
   weight: number,
   isCompleted: boolean,
-  id?: string
+  id: string,
 }
 
 export type Schedule = {
@@ -117,11 +106,9 @@ export default class FirestoreService extends Service {
     if(!this.user) return;
     const docRef = doc(this.db, `users/${this.user.id}/schedules`, id);
     const docSnap = await getDoc(docRef);
-    console.log(docSnap);
     if (docSnap.exists()) {
       const data = docSnap.data();
       this.currSchedule = {...data, id: id} as Schedule;
-      console.log('From fetch schedule', this.currSchedule);
     } else {
       console.log('Failed to retrieve the schedule!');
     }
@@ -134,15 +121,13 @@ export default class FirestoreService extends Service {
     await getDocs(colRef).then((querySnap: QuerySnapshot) => {
       querySnap.forEach(doc => {
         const data = doc.data();
-        tasks[doc.id] = {...data, dueDate: data['dueDate'].toDate(), id: doc.id} as Task
+        tasks[doc.id] = {...data, dueDate: data['dueDate'] ? data['dueDate'].toDate() : null, id: doc.id} as Task
       });
     });
     this.currSchedule.tasks = tasks;
-    console.log('From fetchTasks: ', this.currSchedule.tasks);
   }
 
   @action async updateScheduleName(newName: string): Promise<void> {
-    console.log('Changing schedule name to ', newName)
     if(!this.user || !this.currSchedule || !this.schedules[this.currSchedule.id]) return;
     const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
     await updateDoc(docRef, {name: newName}).catch(e => console.log(e));
@@ -204,17 +189,17 @@ export default class FirestoreService extends Service {
     this.currSchedule = this.currSchedule
   }
 
-  @action async addTask(newTask: TaskPreValidation): Promise<void> {
+  @action async addTask(newTask: Task): Promise<void> {
     if (!this.user || !this.currSchedule) return;
-    if(!(newTask.courseCode && newTask.courseColor && newTask.dueDate && newTask.name)){
-      console.log('Failed to add task');
-      return;
+    if(!(newTask.courseCode && newTask.courseColor && newTask.name && (newTask.dueDate || newTask.dueDate === null))){
+      console.log('Failed to add task')
+      return
     }
-    const colRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}`, 'tasks');
-    delete newTask.id;
-    const docRef = await addDoc(colRef, newTask);
+    const {id, ...serializedTask } = newTask
+    const colRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}`, 'tasks')
+    const docRef = await addDoc(colRef, serializedTask)
     this.currSchedule.tasks[docRef.id] = { ...newTask, id: docRef.id } as Task
-    this.currSchedule = this.currSchedule;
+    this.currSchedule = this.currSchedule
   }
 
   @action async updateTask(updatedTask: Task): Promise<void> {

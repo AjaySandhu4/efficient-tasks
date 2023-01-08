@@ -30,7 +30,6 @@ export default class SchedulesIndexController extends Controller {
     }
 
     @action async deleteSchedule(id: string): Promise<void> {
-        console.log('Deleting schedule...')
         await this.firestore.deleteSchedule(id)
     }
 }

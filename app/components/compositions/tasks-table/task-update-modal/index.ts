@@ -3,7 +3,7 @@ import { service } from '@ember/service';
 import { isEmpty } from '@ember/utils';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import FirestoreService, { Course, Task, TaskPreValidation } from '../../../../services/firestore'
+import FirestoreService, { Course, Task } from '../../../../services/firestore'
 import { cloneDeep, isEqual } from 'lodash'
 
 interface Args {
@@ -11,7 +11,7 @@ interface Args {
     task?: Task
 }
 export default class CompositionsTasksTableTaskUpdateModalComponent extends Component<Args> {
-    initModel: TaskPreValidation = {
+    initModel: Task = {
         isCompleted: false,
         courseCode: '',
         courseColor: 0,
@@ -25,19 +25,14 @@ export default class CompositionsTasksTableTaskUpdateModalComponent extends Comp
     @service firestore!: FirestoreService
     taskTypes: string[] = ['Exam', 'Test', 'Assignment', 'Quiz', 'Other'];
 
-    @tracked taskModel: TaskPreValidation = cloneDeep(this.args.task) ?? cloneDeep(this.initModel);
+    @tracked taskModel: Task = cloneDeep(this.args.task) ?? cloneDeep(this.initModel);
 
     get isFormDirty(): boolean {
-        // console.log(this.taskModel);
         if(isEqual(this.taskModel, this.args.task)) return true; //Check if task is unchanged
-        const associatedCourse: Course | undefined = this.firestore.currSchedule?.courses.find(c => c.code === this.taskModel.courseCode);
+        const associatedCourse: Course | undefined = this.firestore.currSchedule?.courses.find(c => c.code === this.taskModel.courseCode)
         if(!associatedCourse || associatedCourse.color != this.taskModel.courseColor) return true;
         if(isEmpty(this.taskModel.name) || isEmpty(this.taskModel.type) || this.taskModel.weight === -1) return true;
         return false;
-    }
-    
-    @action sayHello(): void {
-        console.log(this.taskModel);
     }
 
     @action updateCourse(course: Course): void {
@@ -54,7 +49,10 @@ export default class CompositionsTasksTableTaskUpdateModalComponent extends Comp
     }
 
     @action updateDueDate(input: any): void {
-        set(this.taskModel, 'dueDate', input[0]);
+        let newDate: Date | null
+        if(!input[0]) newDate = null
+        else newDate = input[0]
+        set(this.taskModel, 'dueDate', newDate);
         this.taskModel = this.taskModel;
     }
 
@@ -67,10 +65,11 @@ export default class CompositionsTasksTableTaskUpdateModalComponent extends Comp
 
     @action submit(): void {
         if(this.args.task){
-            this.firestore.updateTask(this.taskModel as Task);
+            this.firestore.updateTask(this.taskModel as Task)
+            this.args.onClose()
         }
         else{
-            this.firestore.addTask(this.taskModel);
+            this.firestore.addTask(this.taskModel)
         }
     }
 
