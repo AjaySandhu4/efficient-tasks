@@ -4,7 +4,6 @@ import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, Firestore,
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { isEmpty } from '@ember/utils';
 import RouterService from '@ember/routing/router-service'
 
 export type Course = {
@@ -74,7 +73,6 @@ export default class FirestoreService extends Service {
     // Initialize Firebase
     this.app = initializeApp(firebaseConfig);
     this.db = getFirestore(this.app);
-    console.log('setting app up, app, db: ', this.app, this.db)
   }
 
   @action async setupUser(): Promise<void> {
@@ -144,38 +142,41 @@ export default class FirestoreService extends Service {
   }
 
   @action async updateScheduleName(newName: string): Promise<void> {
-    if(!this.user || !this.currSchedule) return;
+    console.log('Changing schedule name to ', newName)
+    if(!this.user || !this.currSchedule || !this.schedules[this.currSchedule.id]) return;
     const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
     await updateDoc(docRef, {name: newName}).catch(e => console.log(e));
     this.currSchedule.name = newName;
+    this.schedules[this.currSchedule.id] = this.currSchedule;
   }
 
   @action async addCourse(newCourse: Course): Promise<void> {
-    if (!this.user || !this.currSchedule) return;
-    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
+    if (!this.user || !this.currSchedule || !this.schedules[this.currSchedule.id]) return
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id)
     await updateDoc(docRef, {
       courses: arrayUnion(newCourse)
-    }).catch(e => console.log(e));
-    this.currSchedule.courses.push(newCourse);
+    }).catch(e => console.log(e))
+    this.currSchedule.courses.push(newCourse)
+    this.schedules[this.currSchedule.id] = this.currSchedule
     this.currSchedule = this.currSchedule
   }
 
   @action async updateCourse(originalCourse: Course, updatedCourse: Course): Promise<void> {
-    if (!this.user || !this.currSchedule) return;
+    if (!this.user || !this.currSchedule || !this.schedules[this.currSchedule.id]) return
 
     //Remove old course and replace with updated version
-    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id);
+    const docRef = doc(this.db, `users/${this.user.id}/schedules`, this.currSchedule.id)
     await updateDoc(docRef, {
       courses: arrayRemove(originalCourse)
-    }).catch(e => console.log(e));
+    }).catch(e => console.log(e))
     await updateDoc(docRef, {
       courses: arrayUnion(updatedCourse)
-    }).catch(e => console.log(e));
+    }).catch(e => console.log(e))
 
     //Update each task
-    const tasksRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`);
-    const taskQuery = query(tasksRef, where('courseCode', '==', originalCourse.code));
-    const batch = writeBatch(this.db);
+    const tasksRef = collection(this.db, `users/${this.user.id}/schedules/${this.currSchedule.id}/tasks`)
+    const taskQuery = query(tasksRef, where('courseCode', '==', originalCourse.code))
+    const batch = writeBatch(this.db)
     await getDocs(taskQuery).then(querySnapshot => {
       querySnapshot.forEach(doc => {
         batch.update(doc.ref, {
@@ -183,23 +184,24 @@ export default class FirestoreService extends Service {
           courseColor: updatedCourse.color,
         });
       });
-    }).catch(e => console.log(e));
-    batch.commit();
+    }).catch(e => console.log(e))
+    batch.commit()
 
     //Update tasks locally
     Object.values(this.currSchedule.tasks).forEach(t => {
       if(t.courseCode === originalCourse.code){
-        set(t, 'courseCode', updatedCourse.code);
-        set(t, 'courseColor', updatedCourse.color);
+        set(t, 'courseCode', updatedCourse.code)
+        set(t, 'courseColor', updatedCourse.color)
       }
     })
 
     //Update course locally
-    let courseToUpdateIndex: number = this.currSchedule.courses.findIndex(c => c.code === originalCourse.code);
-    if(courseToUpdateIndex != -1) set(this.currSchedule.courses, courseToUpdateIndex, updatedCourse);
-    else console.log('Something went wrong updating the course!');
+    let courseToUpdateIndex: number = this.currSchedule.courses.findIndex(c => c.code === originalCourse.code)
+    if(courseToUpdateIndex != -1) set(this.currSchedule.courses, courseToUpdateIndex, updatedCourse)
+    else console.log('Something went wrong updating the course!')
 
-    this.currSchedule = this.currSchedule;
+    this.schedules[this.currSchedule.id] = this.currSchedule
+    this.currSchedule = this.currSchedule
   }
 
   @action async addTask(newTask: TaskPreValidation): Promise<void> {

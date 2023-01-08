@@ -5,9 +5,9 @@
 >
     <div class='fb-row fb-justify-space-between fb-align-center'>
         <Blocks::HeaderInput
-        @value={{this.courseCode}}
-        @placeholder='Enter course code'
-        @onSubmit={{fn (mut this.courseCode)}}
+            @value={{this.courseCode}}
+            @placeholder='Enter course code'
+            @onInput={{fn (mut this.courseCode)}}
         />
         {{#if @course}}
             <Blocks::DeleteButton 

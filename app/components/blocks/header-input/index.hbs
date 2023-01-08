@@ -1,9 +1,10 @@
 {{!-- template-lint-disable require-input-label --}}
 <Input
+    ...attributes
     @type='text'
     @value={{this.currInput}}
     placeholder={{@placeholder}}
-    class={{'header-input w-5.5 pa-1 mv-2' ...attributes}}
+    class='header-input w-5.5 pa-1 mv-2'
     maxlength='30'
-    {{on 'focusout' this.submit}}
+    {{on 'keyup' (fn @onInput this.currInput)}}
 />

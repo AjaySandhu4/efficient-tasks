@@ -1,8 +1,9 @@
 <div class='fb-column ml-2 pl-2'>
     <Blocks::HeaderInput
-        @value={{this.firestore.currSchedule.name}}
+        @value={{this.scheduleName}}
         @placeholder='Enter schedule name'
-        @onSubmit={{@onScheduleNameChange}}
+        @onInput={{fn (mut this.scheduleName)}}
+        {{on 'focusout' this.onScheduleNameChange}}
     />
     {{#each this.firestore.currSchedule.courses as |course|}}
         <div class='fb-row mv-2'>

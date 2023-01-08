@@ -15,6 +15,13 @@ export default class CompositionsCourseListComponent extends Component<Args> {
 
   @tracked creationMode: boolean = false;
   @tracked courseToEdit?: Course;
+  @tracked scheduleName?: string = this.firestore.currSchedule?.name;
+
+  @action onScheduleNameChange(): void {
+    if(this.scheduleName && this.scheduleName !== this.firestore.currSchedule?.name){
+      this.args.onScheduleNameChange(this.scheduleName)
+    }
+  }
 
   @action onSelectCourse(course: Course): void {
     if(course.code === this.args.selectedCourse?.code){

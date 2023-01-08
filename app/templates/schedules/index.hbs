@@ -40,7 +40,7 @@
         <Blocks::HeaderInput
             @value={{this.newScheduleName}}
             @placeholder='Enter schedule name'
-            @onSubmit={{fn (mut this.newScheduleName)}}
+            @onInput={{fn (mut this.newScheduleName)}}
         />
         <div class='fb-row-reverse h-1'>
             <Blocks::Button class='w-2.5 pa-1' disabled={{not this.isNewScheduleValid}} {{on 'click' this.addSchedule}}>Done</Blocks::Button>
