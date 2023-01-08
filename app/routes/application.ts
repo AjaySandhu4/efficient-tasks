@@ -4,12 +4,12 @@ import { service } from '@ember/service';
 import FirestoreService from '../services/firestore';
 
 export default class ApplicationRoute extends Route {
-    @service firestore!: FirestoreService;
-    @service router!: RouterService;
-    async beforeModel(): Promise<void> {
-        if (!this.firestore.isLoggedIn) {
-            this.firestore.setupApp();
-            this.router.transitionTo('login');
-        }
+  @service firestore!: FirestoreService;
+  @service router!: RouterService;
+  async beforeModel(): Promise<void> {
+    if (!this.firestore.isLoggedIn) {
+      this.firestore.setupApp();
+      this.router.transitionTo('login');
     }
+  }
 }
