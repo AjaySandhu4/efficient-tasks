@@ -43,7 +43,7 @@
 }
 
 @for $i from 1 through 10 {
-  .schedule-card-course-#{$i} {
+  .course-font-color-#{$i} {
     color: var(--color-#{$i});
   }
 }

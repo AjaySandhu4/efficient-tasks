@@ -10,7 +10,7 @@ interface Args {
     onClose: () => void
     task?: Task
 }
-export default class CompositionsTasksTableTaskCreationModalComponent extends Component<Args> {
+export default class CompositionsTasksTableTaskUpdateModalComponent extends Component<Args> {
     initModel: TaskPreValidation = {
         isCompleted: false,
         courseCode: '',
