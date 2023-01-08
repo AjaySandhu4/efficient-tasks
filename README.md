@@ -1,7 +1,6 @@
 # efficient-tasks
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+An app with a goal of helping students keep on top of their academic responsibilities. 
 
 ## Prerequisites
 
