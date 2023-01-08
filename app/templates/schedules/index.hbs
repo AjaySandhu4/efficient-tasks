@@ -14,7 +14,7 @@
                 {{/each}}
                 <RightClickMenu @items={{array id}} as |scheduleId|>
                     <Blocks::DeleteButton
-                        @onClick={{this.deleteSchedule scheduleId}}
+                        @onClick={{fn this.deleteSchedule scheduleId}}
                         @warningMsg='Are you sure that you would like to delete this schedule and all of its courses and tasks?'
                     />
                 </RightClickMenu>
