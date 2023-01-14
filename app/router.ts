@@ -11,4 +11,5 @@ Router.map(function () {
     this.route('schedule', { path: '/:id' });
   });
   this.route('login');
+  this.route('home');
 });

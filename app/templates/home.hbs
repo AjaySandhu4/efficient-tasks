@@ -1,0 +1,56 @@
+{{page-title "Home"}}
+<div 
+    {{did-insert this.setupSchedule}}
+    class='fb-column fb-justify-center fb-align-center fl-1 f-7'
+>
+    Welcome{{if this.schedule ' back'}},  {{this.firestore.user.displayName}}!
+    {{#if this.schedule}}
+        <Blocks::Button class='f-5 pa-1 mt-3 blue-border' {{on 'click' this.transitionToSchedule}}>
+            Go to active schedule!
+        </Blocks::Button>
+    {{/if}}
+</div>
+<div class='fb-row fb-justify-center fb-justify-space-around fl-3'>
+    {{#if this.schedule}}
+        <div class='fb-column ba bw-2 blue-border h-6 pt-3 ph-3'>
+            <div class='f-6 text-align-center'>
+                Upcoming tasks:
+            </div>
+            <PowerSelect class='w-5 mt-2' @options={{this.filters}} @onChange={{fn (mut this.taskFilter)}} @selected={{this.taskFilter}} as |option|>
+                {{option}}
+            </PowerSelect>
+            <ul class='overflow-y-auto'>
+                {{#each this.filteredTasks as |task|}}
+                    <li class='f-5 mv-1 course-font-color-{{task.courseColor}}'>{{task.name}}</li>
+                {{/each}}
+            </ul>
+            
+
+            
+        </div>
+        <div class='fb-column ba bw-2 blue-border h-7 w-6 pt-3'>
+            <div class='f-6 text-align-center'>
+                Courses in Progress:
+            </div>
+            {{#each this.schedule.courses as |course|}}
+                {{#let (compute (fn this.courseCompletion course.code)) as |completion|}}
+                    <div class='fb-row'>
+                        <div class='fb-row fl-2 fb-align-center fb-justify-center f-4 ellipsis-right course-font-color-{{course.color}}'>
+                            {{course.code}}
+                        </div>
+                        <Compositions::CoursePieChart
+                            class='fl-1'
+                            @course={{course}}
+                            @completion={{completion}}
+                        />
+                        <div class='fb-row fl-1 fb-align-center fb-justify-center f-4 course-font-color-{{course.color}}'>
+                            {{completion}}%
+                        </div>
+                        
+                    </div>
+                {{/let}}
+                
+            {{/each}}
+        </div>
+    {{/if}}
+</div>

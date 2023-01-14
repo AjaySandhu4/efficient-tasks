@@ -52,6 +52,7 @@ export type User = {
   email: string;
   displayName: string;
   id: string;
+  activeSchedule?: string;
 };
 
 export default class FirestoreService extends Service {
@@ -96,11 +97,13 @@ export default class FirestoreService extends Service {
             email: user.email ?? '',
             displayName: user.displayName ?? '',
             id: user.uid,
+            activeSchedule: docSnap.data()?.['activeSchedule'],
           };
+          console.log(this.user);
           this.isLoggedIn = true;
           this.isAuthSettled = true;
           this.router.transitionTo(
-            localStorage.getItem('redirect-url') ?? 'schedules'
+            localStorage.getItem('redirect-url') ?? 'home'
           );
           localStorage.removeItem('redirect-url');
         });
@@ -383,5 +386,20 @@ export default class FirestoreService extends Service {
     );
     delete this.schedules[id];
     this.schedules = this.schedules;
+    if (id === this.user.activeSchedule) {
+      const userDocRef = doc(this.db, 'users', this.user.id);
+      await updateDoc(userDocRef, { activeSchedule: null }).catch((e) =>
+        console.log(e)
+      );
+      this.user.activeSchedule = undefined;
+    }
+  }
+
+  @action async setActiveSchedule(): Promise<void> {
+    if (!this.user || !this.currSchedule) return;
+    const docRef = doc(this.db, 'users', this.user.id);
+    await updateDoc(docRef, { activeSchedule: this.currSchedule.id });
+    this.user.activeSchedule = this.currSchedule.id;
+    this.user = this.user;
   }
 }

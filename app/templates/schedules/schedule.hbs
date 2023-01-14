@@ -1,6 +1,6 @@
 {{page-title 'Schedule'}}
 
-<div class='fb-row w-100% ml-2 mt-2'>
+<div class='fb-row w-100% ml-2 mr-4 mt-2'>
     <div class='courses-container w-6 h-min-6 h-max-80vh blue-border ba bw-2'>
         <Compositions::CourseList
             @scheduleName={{this.scheduleName}}
@@ -9,9 +9,21 @@
             @onSelectCourse={{fn (mut this.selectedCourse)}}
         />
     </div>
-    <div class='tasks-container ml-7 h-max-80vh'>
+    <div class='tasks-container mh-7 h-max-80vh'>
         <Compositions::TasksTable
             @selectedCourse={{this.selectedCourse}}
         />
+    </div>
+    <div class='fb-column fb-align-center'>
+        <Blocks::Button class='blue-border w-2 ma-2 pa-1'>
+            Export
+        </Blocks::Button>
+        <Blocks::Button 
+            disabled={{eq this.firestore.user.activeSchedule this.firestore.currSchedule.id}} 
+            class='blue-border w-4 ma-2 pa-1' {{on 'click' this.firestore.setActiveSchedule}}
+        >
+            {{if (eq this.firestore.users.activeSchedule this.firestore.currSchedule.id) 'Already the Active Schedule' 'Set As Active Schedule'}}
+        </Blocks::Button>
+        
     </div>
 </div>

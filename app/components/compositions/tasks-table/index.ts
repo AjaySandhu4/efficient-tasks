@@ -75,7 +75,7 @@ export default class CompositionsTasksTableComponent extends Component<Args> {
   }
 
   get filteredRows(): Task[] {
-    let rows: Task[] = this.firestore.currSchedule
+    let rows: Task[] = this.firestore?.currSchedule
       ? Object.values(this.firestore.currSchedule?.tasks)
       : [];
 
