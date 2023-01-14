@@ -1,27 +1,30 @@
-<div class='fb-row fb-align-center mb-1'>
-    <span class='f-4'>
-        Task filters: 
-    </span>
-    <PowerSelect
-        class='w-4 mh-2'
-        @placeholder='Date filter'
-        @selected={{this.dateFilter}}
-        @options={{this.dateFilterOptions}}
-        @onChange={{fn (mut this.dateFilter)}}
-        as |option|
-    >
-        {{option}}
-    </PowerSelect>
-    <PowerSelect
-        class='w-4'
-        @placeholder='Completion filter'
-        @selected={{this.completionFilter}}
-        @options={{this.completionFilterOptions}}
-        @onChange={{fn (mut this.completionFilter)}}
-        as |option|
-    >
-        {{option}}
-    </PowerSelect>
+<div class='fb-row fb-align-center fb-justify-space-between mb-1'>
+    <div class='fb-row'>
+        <span class='f-4'>
+            Task filters: 
+        </span>
+        <PowerSelect
+            class='w-4 mh-2'
+            @placeholder='Date filter'
+            @selected={{this.dateFilter}}
+            @options={{this.dateFilterOptions}}
+            @onChange={{fn (mut this.dateFilter)}}
+            as |option|
+        >
+            {{option}}
+        </PowerSelect>
+        <PowerSelect
+            class='w-4'
+            @placeholder='Completion filter'
+            @selected={{this.completionFilter}}
+            @options={{this.completionFilterOptions}}
+            @onChange={{fn (mut this.completionFilter)}}
+            as |option|
+        >
+            {{option}}
+        </PowerSelect>
+    </div>
+    <Blocks::Button class='blue-border' {{on 'click' (fn (mut this.creationMode) true)}}>Add Task +</Blocks::Button>
 </div>
 
 <EmberTable as |t|>
@@ -65,8 +68,6 @@
         </b.row>
     </t.body>
 </EmberTable>
-
-<Blocks::Button class='blue-border mt-3' {{on 'click' (fn (mut this.creationMode) true)}}>Add Tasks +</Blocks::Button>
 
 {{#if this.creationMode}}
     <Compositions::TasksTable::TaskUpdateModal
