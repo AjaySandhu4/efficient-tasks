@@ -3,11 +3,10 @@ import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import FirestoreService from '../services/firestore';
-import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 import RouterService from '@ember/routing/router-service';
-import { getAuth } from 'firebase/auth';
+import { getAuth, EmailAuthProvider } from 'firebase/auth';
 
 export default class LoginController extends Controller {
   @service firestore!: FirestoreService;
@@ -17,7 +16,7 @@ export default class LoginController extends Controller {
 
   @action setup(): void {
     const uiConfig = {
-      signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+      signInOptions: [EmailAuthProvider.PROVIDER_ID],
       callbacks: {
         signInSuccessWithAuthResult: () => {
           return false;
