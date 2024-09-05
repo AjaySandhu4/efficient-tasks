@@ -17,7 +17,7 @@ export default class LoginController extends Controller {
 
   @action setup(): void {
     const uiConfig = {
-      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+      signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
       callbacks: {
         signInSuccessWithAuthResult: () => {
           return false;
@@ -39,3 +39,5 @@ export default class LoginController extends Controller {
     }
   }
 }
+
+
